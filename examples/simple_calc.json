@@ -1,0 +1,50 @@
+{
+  "metadata": {
+    "domain": "programming",
+    "description": "Simple calculator operations",
+    "target": "ruby"
+  },
+  "actions": [
+    {
+      "actor": "VM",
+      "op": "Bind",
+      "target": "x",
+      "params": {
+        "value": 10
+      }
+    },
+    {
+      "actor": "VM",
+      "op": "Bind",
+      "target": "y",
+      "params": {
+        "value": 5
+      }
+    },
+    {
+      "actor": "VM",
+      "op": "Bind",
+      "target": "sum",
+      "params": {
+        "value": 15
+      }
+    },
+    {
+      "actor": "VM",
+      "op": "Emit",
+      "target": "message",
+      "params": {
+        "content": "x + y = "
+      }
+    },
+    {
+      "actor": "VM",
+      "op": "Call",
+      "target": "puts",
+      "params": {
+        "arg": 15
+      }
+    }
+  ]
+}
+

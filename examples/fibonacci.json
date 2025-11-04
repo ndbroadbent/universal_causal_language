@@ -1,0 +1,66 @@
+{
+  "metadata": {
+    "domain": "programming",
+    "description": "Calculate first 5 Fibonacci numbers",
+    "target": "ruby"
+  },
+  "actions": [
+    {
+      "actor": "VM",
+      "op": "Bind",
+      "target": "a",
+      "params": {
+        "value": 0
+      }
+    },
+    {
+      "actor": "VM",
+      "op": "Bind",
+      "target": "b",
+      "params": {
+        "value": 1
+      }
+    },
+    {
+      "actor": "VM",
+      "op": "Emit",
+      "target": "output",
+      "params": {
+        "content": "Fibonacci sequence:"
+      }
+    },
+    {
+      "actor": "VM",
+      "op": "Call",
+      "target": "print",
+      "params": {
+        "arg": 0
+      }
+    },
+    {
+      "actor": "VM",
+      "op": "Call",
+      "target": "print",
+      "params": {
+        "arg": 1
+      }
+    },
+    {
+      "actor": "VM",
+      "op": "Bind",
+      "target": "c",
+      "params": {
+        "value": 1
+      }
+    },
+    {
+      "actor": "VM",
+      "op": "Call",
+      "target": "print",
+      "params": {
+        "arg": 1
+      }
+    }
+  ]
+}
+

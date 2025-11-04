@@ -1,0 +1,26 @@
+{
+  "metadata": {
+    "domain": "programming",
+    "description": "Classic Hello World program",
+    "target": "ruby"
+  },
+  "actions": [
+    {
+      "actor": "VM",
+      "op": "Emit",
+      "target": "greeting",
+      "params": {
+        "content": "Hello, World!"
+      }
+    },
+    {
+      "actor": "VM",
+      "op": "Emit",
+      "target": "message",
+      "params": {
+        "content": "Welcome to UCL!"
+      }
+    }
+  ]
+}
+

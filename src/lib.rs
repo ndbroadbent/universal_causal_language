@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+pub mod compiler;
+
 /// Core operation types in UCL
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum Operation {

@@ -69,14 +69,14 @@ fn main() -> anyhow::Result<()> {
     let action = Action::new("VM", Operation::Call, "function")
         .with_time(0.0)
         .with_effects(vec!["CPU".to_string()]);
-    
+
     // Build a program
     let mut program = Program::new();
     program.add_action(action);
-    
+
     // Serialize
     println!("{}", program.to_json()?);
-    
+
     Ok(())
 }
 ```
