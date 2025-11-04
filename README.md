@@ -5,6 +5,7 @@ An experimental intermediate representation designed to express **causality** ac
 ## Overview
 
 UCL treats every statement, instruction, law, or behavior as a causal operation: a structured mapping from one state of the world to another. It can encode:
+
 - Function calls in programming languages
 - Sentences in natural language
 - Legal contracts
@@ -12,6 +13,23 @@ UCL treats every statement, instruction, law, or behavior as a causal operation:
 - DNA transcription events
 
 ...all in the same underlying schema.
+
+## One Program, Three Substrates
+
+**The same UCL program can run on:**
+
+1. **Ruby VM** (compiled to Ruby, executed on silicon)
+2. **Brain VM** (simulated human cognition in software)
+3. **YOUR actual brain** (production mode - you execute it mentally)
+
+Try it:
+
+```bash
+# Same program, three different execution environments
+ucl run examples/multiply_universal.json --target ruby
+ucl brain examples/multiply_universal.json --verbose
+ucl brain examples/multiply_universal.json --production  # aka your real brain
+```
 
 ## Installation
 
@@ -117,7 +135,7 @@ ucl brain examples/brain_test.json --production
 
 ### Natural Language
 
-English: *"The cat is black."*
+English: _"The cat is black."_
 
 ```json
 {
@@ -209,16 +227,24 @@ DNA transcription:
 
 The `examples/` directory contains complete UCL programs for various domains:
 
+- **multiply_universal.json** ⭐ - Runs on all three substrates!
 - **natural_language.json** - English sentences as UCL
 - **ruby_code.json** - Ruby program execution
 - **rust_code.json** - Rust program with memory management
 - **music.json** - C major scale
 - **legal_contract.json** - Purchase agreement
 - **biology.json** - Central Dogma (DNA → RNA → Protein)
+- **brain_test.json** - Test program for production brain mode
+- **confusion_test.json** - Tests brain's confusion response
 
 Try them out:
 
 ```bash
+# THE UNIVERSAL PROGRAM - runs on all three substrates!
+ucl run examples/multiply_universal.json --target ruby
+ucl brain examples/multiply_universal.json --verbose
+ucl brain examples/multiply_universal.json --production
+
 # View the biology example
 ucl display examples/biology.json
 
@@ -230,6 +256,49 @@ for file in examples/*.json; do
   echo "Validating $file"
   ucl validate "$file"
 done
+```
+
+## Universal Program Example
+
+**multiply_universal.json** - A program that runs on ALL THREE execution environments!
+
+The program:
+
+1. Generates a random number (A)
+2. Generates another random number (B)
+3. Multiplies them
+4. Outputs the result
+
+**On Ruby VM:**
+
+```ruby
+A = rand(0..9)
+B = rand(0..9)
+result = A * B
+puts result  # Output: 35 (varies each run)
+```
+
+**On Brain VM:**
+
+```
+Generated: A = 5
+Generated: B = 3
+Calculated: result = 5 × 3 = 15
+Output: "15.0"
+```
+
+**On Production Brain (YOU):**
+
+```
+→ Think of a random number between 0 and 9
+→ Remember it as 'A'
+[You think: 7]
+
+→ Calculate: A × B
+→ Store the answer in: result
+[You calculate: 7 × 4 = 28]
+
+Output: "28"
 ```
 
 ## Library Usage
@@ -274,6 +343,7 @@ ucl brain examples/natural_language.json --verbose
 ```
 
 This simulates:
+
 - **Beliefs** (long-term memory)
 - **Emotions** (affective state)
 - **Working memory** (short-term, limited capacity)
@@ -282,6 +352,7 @@ This simulates:
 - **Output** (speech/expression)
 
 When the brain encounters an unknown operation, it responds naturally:
+
 ```
 💭 "Sorry, I don't know what that means: Transcribe"
 🗣️  "I'm not sure what you mean..."
@@ -299,6 +370,7 @@ ucl brain examples/brain_test.json --production
 ```
 
 This interactive mode:
+
 - Walks you through each operation
 - You execute it mentally
 - You report your internal state
@@ -332,6 +404,7 @@ The same causal logic, different substrates.
 - **Visual editor** for UCL programs
 - **REPL** for interactive UCL development
 - **LLM training** on UCL datasets for better causal understanding
+- **More universal programs** that work across all substrates
 
 ## Contributing
 
@@ -340,4 +413,3 @@ This is an experimental project exploring fundamental questions about representa
 ## License
 
 MIT
-

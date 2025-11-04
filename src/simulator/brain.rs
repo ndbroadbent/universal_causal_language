@@ -172,6 +172,7 @@ impl BrainSimulator {
             Operation::Bind => self.bind_concept(action),
             Operation::Oblige => self.create_obligation(action),
             Operation::Wait => self.wait(action),
+            Operation::GenRandomInt => self.gen_random_int(action),
             _ => {
                 // Brain encounters something it doesn't understand
                 let confusion = format!("Sorry, I don't know what that means: {:?}", action.op);
@@ -242,13 +243,33 @@ impl BrainSimulator {
 
     fn emit(&mut self, action: &Action) -> Result<()> {
         // Generate output (speech/expression)
-        let message = action.params
-            .as_ref()
-            .and_then(|p| p.get("content").or_else(|| p.get("message")))
-            .and_then(|v| v.as_str())
-            .unwrap_or(&action.target);
+        let message = if let Some(params) = action.params.as_ref() {
+            if let Some(content) = params.get("content") {
+                // If content is a string matching a variable, output the variable's value
+                if let Some(content_str) = content.as_str() {
+                    if let Some(value) = self.state.beliefs.get(content_str) {
+                        value.to_string()
+                    } else {
+                        content_str.to_string()
+                    }
+                } else {
+                    content.to_string()
+                }
+            } else if let Some(message) = params.get("message") {
+                message.as_str().map(|s| s.to_string()).unwrap_or_else(|| message.to_string())
+            } else {
+                action.target.clone()
+            }
+        } else {
+            // No params - check if target is a variable
+            if let Some(value) = self.state.beliefs.get(&action.target) {
+                value.to_string()
+            } else {
+                action.target.clone()
+            }
+        };
 
-        self.state.output.push(message.to_string());
+        self.state.output.push(message.clone());
 
         // Check for emotional content
         if let Some(params) = &action.params {
@@ -346,6 +367,41 @@ impl BrainSimulator {
     fn write_memory(&mut self, action: &Action) -> Result<()> {
         // Write to memory
         if let Some(params) = &action.params {
+            // Check if it's a computed value from registers
+            if let (Some(lhs_reg), Some(rhs_reg), Some(op)) =
+                (params.get("lhs_register"), params.get("rhs_register"), params.get("operation")) {
+
+                // Get values from registers
+                let lhs_val = self.state.beliefs.get(lhs_reg.as_str().unwrap_or(""))
+                    .and_then(|v| v.as_f64().or_else(|| v.as_i64().map(|i| i as f64)))
+                    .unwrap_or(0.0);
+                let rhs_val = self.state.beliefs.get(rhs_reg.as_str().unwrap_or(""))
+                    .and_then(|v| v.as_f64().or_else(|| v.as_i64().map(|i| i as f64)))
+                    .unwrap_or(0.0);
+
+                let operation = op.as_str().unwrap_or("");
+                let result = match operation {
+                    "multiply" => lhs_val * rhs_val,
+                    "add" => lhs_val + rhs_val,
+                    "subtract" => lhs_val - rhs_val,
+                    "divide" => if rhs_val != 0.0 { lhs_val / rhs_val } else { 0.0 },
+                    _ => lhs_val * rhs_val,
+                };
+
+                self.state.beliefs.insert(action.target.clone(), serde_json::json!(result));
+                self.state.thoughts.push(format!("Calculated: {} = {} {} {} = {}",
+                    action.target, lhs_val,
+                    match operation { "multiply" => "×", "add" => "+", "subtract" => "-", "divide" => "÷", _ => "×" },
+                    rhs_val, result));
+
+                if self.verbose {
+                    println!("  🧮 Calculated: {} = {}", action.target, result);
+                }
+
+                return Ok(());
+            }
+
+            // Otherwise use direct value
             if let Some(value) = params.get("value") {
                 self.state.beliefs.insert(action.target.clone(), value.clone());
 
@@ -414,6 +470,47 @@ impl BrainSimulator {
 
         if self.verbose {
             println!("  ⏳ Waiting: {:.1}s", duration);
+        }
+
+        Ok(())
+    }
+
+    fn gen_random_int(&mut self, action: &Action) -> Result<()> {
+        // Generate a random integer
+        use std::collections::hash_map::RandomState;
+        use std::hash::{BuildHasher, Hash, Hasher};
+
+        let (min, max) = if let Some(params) = &action.params {
+            let min_val = params.get("min")
+                .and_then(|v| v.as_i64())
+                .unwrap_or(0);
+            let max_val = params.get("max")
+                .and_then(|v| v.as_i64())
+                .unwrap_or(9);
+            (min_val, max_val)
+        } else {
+            (0, 9)
+        };
+
+        // Simple random number generation using system time
+        let state = RandomState::new();
+        let mut hasher = state.build_hasher();
+        std::time::SystemTime::now().hash(&mut hasher);
+        action.target.hash(&mut hasher);
+        let hash = hasher.finish();
+        let range = (max - min + 1) as u64;
+        let random_num = min + (hash % range) as i64;
+
+        // Store in beliefs
+        self.state.beliefs.insert(
+            action.target.clone(),
+            serde_json::json!(random_num)
+        );
+
+        self.state.thoughts.push(format!("Generated random number: {} = {}", action.target, random_num));
+
+        if self.verbose {
+            println!("  🎲 Generated: {} = {}", action.target, random_num);
         }
 
         Ok(())

@@ -487,6 +487,30 @@ fn run_on_production_brain(program: &Program) -> anyhow::Result<()> {
                 println!("   → Bind this concept to a mental variable");
                 println!("   → Associate '{}' with a value", action.target);
             }
+            Operation::Write => {
+                if let Some(params) = &action.params {
+                    if params.contains_key("lhs_register") && params.contains_key("rhs_register") {
+                        let lhs = params.get("lhs_register").and_then(|v| v.as_str()).unwrap_or("?");
+                        let rhs = params.get("rhs_register").and_then(|v| v.as_str()).unwrap_or("?");
+                        let op = params.get("operation").and_then(|v| v.as_str()).unwrap_or("multiply");
+                        let symbol = match op {
+                            "multiply" => "×",
+                            "add" => "+",
+                            "subtract" => "-",
+                            "divide" => "÷",
+                            _ => "×"
+                        };
+                        println!("   → Recall {} and {}", lhs, rhs);
+                        println!("   → Calculate: {} {} {}", lhs, symbol, rhs);
+                        println!("   → Store the answer in: {}", action.target);
+                    } else {
+                        println!("   → Update memory: {}", action.target);
+                        println!("   → Store a new value");
+                    }
+                } else {
+                    println!("   → Update memory: {}", action.target);
+                }
+            }
             Operation::Oblige => {
                 println!("   → Accept this obligation");
                 println!("   → Add to your active goals");
@@ -495,6 +519,17 @@ fn run_on_production_brain(program: &Program) -> anyhow::Result<()> {
                 let duration = action.dur.unwrap_or(1.0);
                 println!("   → Wait and let {} seconds pass", duration);
                 println!("   → Be present in this moment");
+            }
+            Operation::GenRandomInt => {
+                if let Some(params) = &action.params {
+                    let min = params.get("min").and_then(|v| v.as_i64()).unwrap_or(0);
+                    let max = params.get("max").and_then(|v| v.as_i64()).unwrap_or(9);
+                    println!("   → Think of a random number between {} and {}", min, max);
+                    println!("   → Remember it as '{}'", action.target);
+                } else {
+                    println!("   → Generate a random number");
+                    println!("   → Remember it as '{}'", action.target);
+                }
             }
             _ => {
                 println!("   ⚠️  UNKNOWN OPERATION!");

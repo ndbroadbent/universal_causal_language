@@ -1,0 +1,45 @@
+{
+  "metadata": {
+    "domain": "computation",
+    "description": "Universal program that runs on Ruby VM, Brain VM, and an Actual Human Brain",
+    "note": "Generate random numbers and multiply them - works on any substrate!"
+  },
+  "actions": [
+    {
+      "actor": "executor",
+      "op": "GenRandomInt",
+      "target": "A",
+      "params": {
+        "min": 0,
+        "max": 9
+      }
+    },
+    {
+      "actor": "executor",
+      "op": "GenRandomInt",
+      "target": "B",
+      "params": {
+        "min": 0,
+        "max": 9
+      }
+    },
+    {
+      "actor": "executor",
+      "op": "Write",
+      "target": "result",
+      "params": {
+        "operation": "multiply",
+        "lhs_register": "A",
+        "rhs_register": "B"
+      }
+    },
+    {
+      "actor": "executor",
+      "op": "Emit",
+      "target": "result",
+      "params": {
+        "content": "result"
+      }
+    }
+  ]
+}

@@ -47,6 +47,9 @@ pub enum Operation {
     Assign,
     Return,
 
+    // Random number generation
+    GenRandomInt,
+
     // Custom operation for extensibility
     Custom(String),
 

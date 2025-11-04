@@ -50,6 +50,7 @@ impl RubyCompiler {
             Operation::Return => self.compile_return(action, &indent),
             Operation::Decide => self.compile_decide(action, &indent),
             Operation::Wait => self.compile_wait(action, &indent),
+            Operation::GenRandomInt => self.compile_gen_random_int(action, &indent),
             _ => {
                 // For unsupported operations, generate a comment
                 Ok(format!("{}# Unsupported operation: {:?} on {}",
@@ -61,9 +62,25 @@ impl RubyCompiler {
     fn compile_call(&mut self, action: &Action, indent: &str) -> Result<String> {
         let params = action.params.as_ref();
 
-        // Handle special case for binary operators
+        // Handle special case for binary operators with registers
         if let Some(p) = params {
-            if let (Some(lhs), Some(rhs)) = (p.get("lhs"), p.get("rhs")) {
+            // Check for register references first
+            if let (Some(lhs_reg), Some(rhs_reg)) = (p.get("lhs_register"), p.get("rhs_register")) {
+                let target = &action.target;
+                let lhs_name = lhs_reg.as_str().unwrap_or("");
+                let rhs_name = rhs_reg.as_str().unwrap_or("");
+
+                // Check if it's an operator
+                if ["+", "-", "*", "/", "%", "**"].contains(&target.as_str()) {
+                    return Ok(format!("{}({} {} {})",
+                        indent,
+                        lhs_name,
+                        target,
+                        rhs_name));
+                }
+            }
+            // Then check for direct values
+            else if let (Some(lhs), Some(rhs)) = (p.get("lhs"), p.get("rhs")) {
                 let target = &action.target;
 
                 // Check if it's an operator
@@ -114,12 +131,32 @@ impl RubyCompiler {
     }
 
     fn compile_write(&mut self, action: &Action, indent: &str) -> Result<String> {
-        let value = action.params
-            .as_ref()
-            .and_then(|p| p.get("value"))
-            .ok_or_else(|| anyhow!("Write requires 'value' parameter"))?;
+        if let Some(params) = &action.params {
+            // Check if it's a computed value from registers
+            if let (Some(lhs_reg), Some(rhs_reg), Some(op)) =
+                (params.get("lhs_register"), params.get("rhs_register"), params.get("operation")) {
+                let lhs_name = lhs_reg.as_str().unwrap_or("");
+                let rhs_name = rhs_reg.as_str().unwrap_or("");
+                let operation = op.as_str().unwrap_or("");
 
-        Ok(format!("{}{} = {}", indent, action.target, self.value_to_ruby(value)))
+                let operator = match operation {
+                    "multiply" => "*",
+                    "add" => "+",
+                    "subtract" => "-",
+                    "divide" => "/",
+                    _ => "*",
+                };
+
+                return Ok(format!("{}{} = {} {} {}", indent, action.target, lhs_name, operator, rhs_name));
+            }
+
+            // Otherwise use direct value
+            if let Some(value) = params.get("value") {
+                return Ok(format!("{}{} = {}", indent, action.target, self.value_to_ruby(value)));
+            }
+        }
+
+        Err(anyhow!("Write requires 'value' parameter or register operation"))
     }
 
     fn compile_read(&mut self, action: &Action, indent: &str) -> Result<String> {
@@ -141,11 +178,24 @@ impl RubyCompiler {
     }
 
     fn compile_emit(&mut self, action: &Action, indent: &str) -> Result<String> {
-        let msg = action.params
-            .as_ref()
-            .and_then(|p| p.get("content").or_else(|| p.get("message")))
-            .map(|v| self.value_to_ruby(v))
-            .unwrap_or_else(|| format!("\"{}\"", action.target));
+        let msg = if let Some(params) = action.params.as_ref() {
+            if let Some(content) = params.get("content") {
+                // If content matches the target, it's likely a variable reference
+                if content.as_str() == Some(&action.target) {
+                    action.target.clone()
+                } else {
+                    self.value_to_ruby(content)
+                }
+            } else if let Some(message) = params.get("message") {
+                self.value_to_ruby(message)
+            } else {
+                // No content param, just use target as variable
+                action.target.clone()
+            }
+        } else {
+            // No params, treat target as variable name
+            action.target.clone()
+        };
 
         Ok(format!("{}puts {}", indent, msg))
     }
@@ -217,6 +267,26 @@ impl RubyCompiler {
             .unwrap_or(1.0);
 
         Ok(format!("{}sleep {}", indent, duration))
+    }
+
+    fn compile_gen_random_int(&mut self, action: &Action, indent: &str) -> Result<String> {
+        let (min, max) = if let Some(params) = &action.params {
+            let min_val = params.get("min")
+                .and_then(|v| v.as_i64())
+                .unwrap_or(0);
+            let max_val = params.get("max")
+                .and_then(|v| v.as_i64())
+                .unwrap_or(9);
+            (min_val, max_val)
+        } else {
+            (0, 9)
+        };
+
+        let var_name = &action.target;
+        self.variables.insert(var_name.clone(), "random_int".to_string());
+
+        // Ruby: variable = rand(min..max)
+        Ok(format!("{}{} = rand({}..{})", indent, var_name, min, max))
     }
 
     fn value_to_ruby(&self, value: &serde_json::Value) -> String {
