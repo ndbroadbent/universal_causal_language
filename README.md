@@ -108,6 +108,9 @@ ucl run examples/natural_language.json --target brain
 
 # Brain simulation with verbose output
 ucl brain examples/natural_language.json --verbose
+
+# PRODUCTION MODE: Run on YOUR actual brain!
+ucl brain examples/brain_test.json --production
 ```
 
 ## Examples
@@ -286,6 +289,24 @@ When the brain encounters an unknown operation, it responds naturally:
 ```
 
 See [BRAIN_VM.md](BRAIN_VM.md) for the full documentation on this groundbreaking concept.
+
+### 🚀 Production Brain Mode
+
+Take it to the next level - run UCL on YOUR actual biological brain:
+
+```bash
+ucl brain examples/brain_test.json --production
+```
+
+This interactive mode:
+- Walks you through each operation
+- You execute it mentally
+- You report your internal state
+- Captures real human cognitive performance
+
+No simulation. No virtual machine. Just your neurons executing UCL operations. 🧠💼
+
+See [PRODUCTION_BRAIN.md](PRODUCTION_BRAIN.md) for the full guide to running language on production wetware.
 
 ## Cross-Domain Compilation
 

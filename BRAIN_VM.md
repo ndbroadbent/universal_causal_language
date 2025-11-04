@@ -171,7 +171,7 @@ Cognition is the **computation**, not the substrate. A biological brain and a si
 Language becomes an API to any cognitive system:
 ```
 Human Brain API: natural_language → brain_state
-AI Brain API: natural_language → brain_state  
+AI Brain API: natural_language → brain_state
 ```
 
 Same interface, different implementation.
@@ -211,7 +211,7 @@ The subjective experience might be the **what it's like** to be the execution en
 cat > my_language.json << 'EOF'
 {
   "actions": [
-    {"actor": "me", "op": "StoreFact", "target": "UCL", 
+    {"actor": "me", "op": "StoreFact", "target": "UCL",
      "params": {"property": "mind-blowing"}},
     {"actor": "me", "op": "Emit", "target": "reaction",
      "params": {"content": "This changes everything!"}}

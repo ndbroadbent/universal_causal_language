@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "domain": "cognitive_test",
+    "description": "Simple program to test your actual brain in production mode"
+  },
+  "actions": [
+    {
+      "actor": "you",
+      "op": "StoreFact",
+      "target": "elephant",
+      "params": {
+        "color": "gray",
+        "size": "large"
+      }
+    },
+    {
+      "actor": "you",
+      "op": "Emit",
+      "target": "thought",
+      "params": {
+        "content": "Elephants are magnificent creatures"
+      }
+    },
+    {
+      "actor": "you",
+      "op": "Decide",
+      "target": "action",
+      "params": {
+        "choice": "remember this moment"
+      }
+    }
+  ]
+}
+

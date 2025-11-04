@@ -50,6 +50,9 @@ ucl brain examples/natural_language.json --verbose
 
 # Or use the run command
 ucl run examples/natural_language.json --target brain
+
+# PRODUCTION MODE: Run on YOUR actual brain!
+ucl brain examples/brain_test.json --production
 ```
 
 ## Run Tests
