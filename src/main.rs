@@ -78,11 +78,11 @@ enum Commands {
     Brain {
         /// Path to the UCL file
         file: PathBuf,
-        
+
         /// Verbose output showing each cognitive operation
         #[arg(short, long)]
         verbose: bool,
-        
+
         /// Run on production (your actual brain) instead of simulated brain
         #[arg(short, long)]
         production: bool,
@@ -377,32 +377,32 @@ fn run_file(path: &PathBuf, target: &str, verbose: bool) -> anyhow::Result<()> {
 
 fn brain_simulate(path: &PathBuf, verbose: bool, production: bool) -> anyhow::Result<()> {
     let program = validate_file(path)?;
-    
+
     if production {
         return run_on_production_brain(&program);
     }
-    
+
     let mut simulator = BrainSimulator::new().with_verbose(verbose);
-    
+
     println!("🧠 Simulating language execution on virtual human brain...\n");
-    
+
     simulator.execute(&program)?;
-    
+
     println!("\n{}", simulator.state().display());
-    
+
     if !simulator.state().trace.is_empty() {
         println!("Execution Trace:");
         for (i, step) in simulator.state().trace.iter().enumerate() {
             println!("  {}. {}", i + 1, step);
         }
     }
-    
+
     Ok(())
 }
 
 fn run_on_production_brain(program: &Program) -> anyhow::Result<()> {
     use std::io::{self, Write};
-    
+
     println!("🧠💼 PRODUCTION MODE: Running on YOUR actual brain!");
     println!("{}", "=".repeat(60));
     println!();
@@ -416,20 +416,20 @@ fn run_on_production_brain(program: &Program) -> anyhow::Result<()> {
     println!();
     print!("Ready to begin? (y/n): ");
     io::stdout().flush()?;
-    
+
     let mut input = String::new();
     io::stdin().read_line(&mut input)?;
-    
+
     if !input.trim().eq_ignore_ascii_case("y") {
         println!("\n❌ Aborted. Your brain remains in its current state.");
         return Ok(());
     }
-    
+
     println!("\n🚀 Initiating brain program execution...\n");
-    
+
     let mut execution_log = Vec::new();
     let start_time = std::time::Instant::now();
-    
+
     for (i, action) in program.actions.iter().enumerate() {
         println!("{}", "─".repeat(60));
         println!("STEP {}/{}: {:?} Operation", i + 1, program.actions.len(), action.op);
@@ -439,21 +439,21 @@ fn run_on_production_brain(program: &Program) -> anyhow::Result<()> {
         println!("   Actor:  {}", action.actor);
         println!("   Op:     {:?}", action.op);
         println!("   Target: {}", action.target);
-        
+
         if let Some(params) = &action.params {
             println!("   Params:");
             for (key, value) in params {
                 println!("     • {} = {}", key, value);
             }
         }
-        
+
         if let Some(effects) = &action.effects {
             println!("   Effects: [{}]", effects.join(", "));
         }
-        
+
         println!();
         println!("🎯 Your Task:");
-        
+
         match action.op {
             Operation::StoreFact => {
                 println!("   → Store this information in your memory");
@@ -502,34 +502,34 @@ fn run_on_production_brain(program: &Program) -> anyhow::Result<()> {
                 println!("   → Notice you don't understand");
             }
         }
-        
+
         println!();
         print!("✅ Press ENTER when you've executed this operation...");
         io::stdout().flush()?;
-        
+
         let mut _dummy = String::new();
         io::stdin().read_line(&mut _dummy)?;
-        
+
         // Ask for state report
         println!();
         println!("📊 Post-Execution Report:");
         println!();
-        
+
         print!("What are you thinking right now? ");
         io::stdout().flush()?;
         let mut thought = String::new();
         io::stdin().read_line(&mut thought)?;
-        
+
         print!("How do you feel? (emotion): ");
         io::stdout().flush()?;
         let mut emotion = String::new();
         io::stdin().read_line(&mut emotion)?;
-        
+
         print!("What do you remember? ");
         io::stdout().flush()?;
         let mut memory = String::new();
         io::stdin().read_line(&mut memory)?;
-        
+
         execution_log.push(format!(
             "Step {}: {:?}({})\n  Thought: {}\n  Emotion: {}\n  Memory: {}",
             i + 1,
@@ -539,12 +539,12 @@ fn run_on_production_brain(program: &Program) -> anyhow::Result<()> {
             emotion.trim(),
             memory.trim()
         ));
-        
+
         println!("\n✓ Step {} complete. Brain state updated.\n", i + 1);
     }
-    
+
     let elapsed = start_time.elapsed();
-    
+
     println!("\n");
     println!("🎉 PROGRAM EXECUTION COMPLETE 🎉");
     println!("{}", "=".repeat(60));
@@ -556,12 +556,12 @@ fn run_on_production_brain(program: &Program) -> anyhow::Result<()> {
     println!();
     println!("🧠 Production Brain State Capture:");
     println!("{}", "─".repeat(60));
-    
+
     for log in &execution_log {
         println!("{}", log);
         println!();
     }
-    
+
     println!("{}", "=".repeat(60));
     println!();
     println!("💡 Insights:");
@@ -570,7 +570,7 @@ fn run_on_production_brain(program: &Program) -> anyhow::Result<()> {
     println!("   • You are now running UCL in production 🚀");
     println!();
     println!("Thank you for being a biological runtime environment! 🧠✨");
-    
+
     Ok(())
 }
 

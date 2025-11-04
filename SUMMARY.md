@@ -168,7 +168,7 @@ This is EXACTLY how real brains respond to incomprehensible input!
 ### Substrate Independence
 The SAME program runs on:
 - Silicon (Ruby VM)
-- Software (Brain VM)  
+- Software (Brain VM)
 - Wetware (YOUR brain)
 
 **Cognition is the computation, not the substrate.**
@@ -232,7 +232,7 @@ cargo build --release
 
 This isn't just a programming language. It's:
 - A new way to think about **computation**
-- A new way to understand **cognition**  
+- A new way to understand **cognition**
 - A new way to process **communication**
 - A proof that **you are a computer**
 
