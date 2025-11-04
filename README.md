@@ -87,6 +87,29 @@ This provides statistics about operations, actors, domains, and temporal charact
 ucl convert examples/rust_code.json --format json
 ```
 
+### Compile UCL to other languages
+
+```bash
+# Compile to Ruby
+ucl compile examples/hello_world.json --target ruby
+
+# Compile and save to file
+ucl compile examples/simple_calc.json --target ruby --output program.rb
+```
+
+### Run UCL programs
+
+```bash
+# Compile to Ruby and execute
+ucl run examples/hello_world.json --target ruby
+
+# Execute on the brain VM (simulate language running on a human brain)
+ucl run examples/natural_language.json --target brain
+
+# Brain simulation with verbose output
+ucl brain examples/natural_language.json --verbose
+```
+
 ## Examples
 
 ### Natural Language
@@ -239,13 +262,55 @@ UCL is based on the hypothesis that **all forms of communication are causal prog
 3. **Enable cross-domain reasoning** and compilation
 4. **Bridge human and machine understanding**
 
+## Brain VM: Language as Code
+
+UCL includes a **virtual human brain** that executes natural language as programs:
+
+```bash
+ucl brain examples/natural_language.json --verbose
+```
+
+This simulates:
+- **Beliefs** (long-term memory)
+- **Emotions** (affective state)
+- **Working memory** (short-term, limited capacity)
+- **Thoughts** (internal narrative)
+- **Goals** (intentions)
+- **Output** (speech/expression)
+
+When the brain encounters an unknown operation, it responds naturally:
+```
+💭 "Sorry, I don't know what that means: Transcribe"
+🗣️  "I'm not sure what you mean..."
+[confusion: +0.4, curiosity: +0.3]
+```
+
+See [BRAIN_VM.md](BRAIN_VM.md) for the full documentation on this groundbreaking concept.
+
+## Cross-Domain Compilation
+
+UCL can compile to different execution targets:
+
+```bash
+# Compile to Ruby
+ucl compile examples/hello_world.json --target ruby --output hello.rb
+ruby hello.rb
+
+# Execute on brain VM
+ucl brain examples/natural_language.json
+```
+
+The same causal logic, different substrates.
+
 ## Future Directions
 
 - **Domain adapters** for automatic translation (English → UCL, Python → UCL, etc.)
-- **UCL-to-UCL translators** for cross-domain compilation
+- **More compilation targets** (Python, JavaScript, neural networks)
+- **UCL-to-UCL translators** for cross-domain compilation (Code → Legal, Music → Code)
+- **Richer brain models** (episodic memory, reasoning, dreaming)
 - **Visual editor** for UCL programs
 - **REPL** for interactive UCL development
-- **LLM training** on UCL datasets
+- **LLM training** on UCL datasets for better causal understanding
 
 ## Contributing
 

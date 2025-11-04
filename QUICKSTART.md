@@ -37,6 +37,21 @@ ucl analyze examples/ruby_code.json
 ucl convert examples/rust_code.json --format json
 ```
 
+### Compile to Ruby
+```bash
+ucl compile examples/hello_world.json --target ruby
+ucl run examples/hello_world.json --target ruby
+```
+
+### Run on Brain VM
+```bash
+# Execute language as a program on a virtual human brain
+ucl brain examples/natural_language.json --verbose
+
+# Or use the run command
+ucl run examples/natural_language.json --target brain
+```
+
 ## Run Tests
 
 ```bash
@@ -81,10 +96,41 @@ fn main() -> anyhow::Result<()> {
 }
 ```
 
+## Key Features
+
+### 🧠 Brain VM
+Execute language as programs on a virtual human brain:
+```bash
+ucl brain examples/natural_language.json --verbose
+```
+
+The brain tracks:
+- Beliefs and memories
+- Emotional states
+- Working memory
+- Thoughts and goals
+- Speech output
+
+### 💎 Ruby Compilation
+Compile UCL to Ruby and execute:
+```bash
+ucl run examples/hello_world.json --target ruby
+```
+
+### 🤔 Natural Confusion
+When the brain encounters unknown operations:
+```
+💭 "Sorry, I don't know what that means"
+🗣️  "I'm not sure what you mean..."
+[confusion: ↑, curiosity: ↑]
+```
+
 ## Next Steps
 
 1. Explore the examples in `examples/`
-2. Try creating your own UCL programs
-3. Read the full documentation in `README.md`
-4. Check out `PRD.txt` for the conceptual framework
+2. Try the brain simulator with different programs
+3. Compile UCL to Ruby and run it
+4. Read `BRAIN_VM.md` for the mind-blowing brain VM concept
+5. Read the full documentation in `README.md`
+6. Check out `PRD.txt` for the conceptual framework
 

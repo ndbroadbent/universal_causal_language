@@ -1,5 +1,5 @@
 use crate::{Action, Operation, Program};
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use std::collections::HashMap;
 
 /// Represents the state of a simulated human brain
@@ -7,25 +7,25 @@ use std::collections::HashMap;
 pub struct BrainState {
     /// Facts and beliefs stored in memory
     pub beliefs: HashMap<String, serde_json::Value>,
-    
+
     /// Emotional state
     pub emotions: HashMap<String, f64>,
-    
+
     /// Working memory (short-term)
     pub working_memory: Vec<String>,
-    
+
     /// Attention focus
     pub attention: Option<String>,
-    
+
     /// Output buffer (what the brain wants to express)
     pub output: Vec<String>,
-    
+
     /// Internal narrative/thoughts
     pub thoughts: Vec<String>,
-    
+
     /// Goals and intentions
     pub goals: Vec<String>,
-    
+
     /// Execution trace for debugging
     pub trace: Vec<String>,
 }
@@ -43,12 +43,12 @@ impl BrainState {
             trace: Vec::new(),
         }
     }
-    
+
     pub fn display(&self) -> String {
         let mut output = String::new();
-        
+
         output.push_str("=== Brain State ===\n\n");
-        
+
         if !self.beliefs.is_empty() {
             output.push_str("Beliefs:\n");
             for (key, value) in &self.beliefs {
@@ -56,7 +56,7 @@ impl BrainState {
             }
             output.push('\n');
         }
-        
+
         if !self.emotions.is_empty() {
             output.push_str("Emotional State:\n");
             for (emotion, intensity) in &self.emotions {
@@ -64,7 +64,7 @@ impl BrainState {
             }
             output.push('\n');
         }
-        
+
         if !self.working_memory.is_empty() {
             output.push_str("Working Memory:\n");
             for item in &self.working_memory {
@@ -72,11 +72,11 @@ impl BrainState {
             }
             output.push('\n');
         }
-        
+
         if let Some(focus) = &self.attention {
             output.push_str(&format!("Current Focus: {}\n\n", focus));
         }
-        
+
         if !self.goals.is_empty() {
             output.push_str("Active Goals:\n");
             for goal in &self.goals {
@@ -84,7 +84,7 @@ impl BrainState {
             }
             output.push('\n');
         }
-        
+
         if !self.thoughts.is_empty() {
             output.push_str("Internal Thoughts:\n");
             for thought in &self.thoughts {
@@ -92,7 +92,7 @@ impl BrainState {
             }
             output.push('\n');
         }
-        
+
         if !self.output.is_empty() {
             output.push_str("Output/Speech:\n");
             for text in &self.output {
@@ -100,7 +100,7 @@ impl BrainState {
             }
             output.push('\n');
         }
-        
+
         output
     }
 }
@@ -124,41 +124,41 @@ impl BrainSimulator {
             verbose: false,
         }
     }
-    
+
     pub fn with_verbose(mut self, verbose: bool) -> Self {
         self.verbose = verbose;
         self
     }
-    
+
     pub fn state(&self) -> &BrainState {
         &self.state
     }
-    
+
     pub fn execute(&mut self, program: &Program) -> Result<()> {
         if self.verbose {
             println!("🧠 Starting brain simulation...\n");
         }
-        
+
         for (i, action) in program.actions.iter().enumerate() {
             if self.verbose {
-                println!("Step {}: {:?} - {} → {}", 
+                println!("Step {}: {:?} - {} → {}",
                     i + 1, action.op, action.actor, action.target);
             }
-            
+
             self.execute_action(action)?;
-            
+
             if self.verbose {
                 println!();
             }
         }
-        
+
         Ok(())
     }
-    
+
     fn execute_action(&mut self, action: &Action) -> Result<()> {
         let trace_msg = format!("{:?}({})", action.op, action.target);
         self.state.trace.push(trace_msg);
-        
+
         match &action.op {
             Operation::StoreFact => self.store_fact(action),
             Operation::Assert => self.assert_fact(action),
@@ -173,32 +173,43 @@ impl BrainSimulator {
             Operation::Oblige => self.create_obligation(action),
             Operation::Wait => self.wait(action),
             _ => {
+                // Brain encounters something it doesn't understand
+                let confusion = format!("Sorry, I don't know what that means: {:?}", action.op);
+                self.state.thoughts.push(confusion.clone());
+                self.state.output.push("I'm not sure what you mean...".to_string());
+
+                // Encountering unknown concepts creates mild confusion/curiosity
+                *self.state.emotions.entry("confusion".to_string()).or_insert(0.0) += 0.4;
+                *self.state.emotions.entry("curiosity".to_string()).or_insert(0.0) += 0.3;
+
                 if self.verbose {
-                    println!("  ⚠️  Unsupported operation for brain: {:?}", action.op);
+                    println!("  🤔 {}", confusion);
+                    println!("  🗣️  \"I'm not sure what you mean...\"");
                 }
+
                 Ok(())
             }
         }
     }
-    
+
     fn store_fact(&mut self, action: &Action) -> Result<()> {
         // Store a fact in belief memory
         if let Some(params) = &action.params {
             for (key, value) in params {
                 let fact_key = format!("{}.{}", action.target, key);
                 self.state.beliefs.insert(fact_key.clone(), value.clone());
-                
+
                 if self.verbose {
                     println!("  📝 Stored: {} = {}", fact_key, value);
                 }
             }
-            
+
             // Update working memory
-            let memory_item = format!("The {} has properties: {}", 
+            let memory_item = format!("The {} has properties: {}",
                 action.target,
                 params.keys().map(|k| k.as_str()).collect::<Vec<_>>().join(", "));
             self.state.working_memory.push(memory_item);
-            
+
             // Keep working memory limited
             if self.state.working_memory.len() > 7 {
                 self.state.working_memory.remove(0);
@@ -206,7 +217,7 @@ impl BrainSimulator {
         }
         Ok(())
     }
-    
+
     fn assert_fact(&mut self, action: &Action) -> Result<()> {
         // Assert a fact (stronger than store - becomes a belief)
         let statement = action.params
@@ -214,21 +225,21 @@ impl BrainSimulator {
             .and_then(|p| p.get("statement"))
             .and_then(|v| v.as_str())
             .unwrap_or(&action.target);
-        
+
         self.state.beliefs.insert(
             format!("assertion.{}", action.target),
             serde_json::json!(statement)
         );
-        
+
         self.state.thoughts.push(format!("I believe that: {}", statement));
-        
+
         if self.verbose {
             println!("  ✓ Asserted: {}", statement);
         }
-        
+
         Ok(())
     }
-    
+
     fn emit(&mut self, action: &Action) -> Result<()> {
         // Generate output (speech/expression)
         let message = action.params
@@ -236,9 +247,9 @@ impl BrainSimulator {
             .and_then(|p| p.get("content").or_else(|| p.get("message")))
             .and_then(|v| v.as_str())
             .unwrap_or(&action.target);
-        
+
         self.state.output.push(message.to_string());
-        
+
         // Check for emotional content
         if let Some(params) = &action.params {
             if let Some(intent) = params.get("intent").and_then(|v| v.as_str()) {
@@ -247,14 +258,14 @@ impl BrainSimulator {
                 }
             }
         }
-        
+
         if self.verbose {
             println!("  🗣️  Output: \"{}\"", message);
         }
-        
+
         Ok(())
     }
-    
+
     fn receive(&mut self, action: &Action) -> Result<()> {
         // Receive input (perception)
         let input = action.params
@@ -262,35 +273,35 @@ impl BrainSimulator {
             .and_then(|p| p.get("content"))
             .and_then(|v| v.as_str())
             .unwrap_or(&action.target);
-        
+
         self.state.working_memory.push(format!("Heard: {}", input));
         self.state.attention = Some(input.to_string());
-        
+
         if self.verbose {
             println!("  👂 Received: \"{}\"", input);
         }
-        
+
         Ok(())
     }
-    
+
     fn measure(&mut self, action: &Action) -> Result<()> {
         // Observe/measure something
         self.state.attention = Some(action.target.clone());
-        
+
         if let Some(params) = &action.params {
             for (key, value) in params {
                 let obs_key = format!("observed.{}.{}", action.target, key);
                 self.state.beliefs.insert(obs_key, value.clone());
             }
         }
-        
+
         if self.verbose {
             println!("  👁️  Observing: {}", action.target);
         }
-        
+
         Ok(())
     }
-    
+
     fn decide(&mut self, action: &Action) -> Result<()> {
         // Make a decision
         let decision = action.params
@@ -298,55 +309,55 @@ impl BrainSimulator {
             .and_then(|p| p.get("choice").or_else(|| p.get("decision")))
             .and_then(|v| v.as_str())
             .unwrap_or(&action.target);
-        
+
         self.state.thoughts.push(format!("Decided to: {}", decision));
-        
+
         // Decisions often become goals
         if let Some(params) = &action.params {
             if let Some(goal) = params.get("goal").and_then(|v| v.as_str()) {
                 self.state.goals.push(goal.to_string());
             }
         }
-        
+
         if self.verbose {
             println!("  🤔 Decision: {}", decision);
         }
-        
+
         Ok(())
     }
-    
+
     fn read(&mut self, action: &Action) -> Result<()> {
         // Read from memory
         let value = self.state.beliefs.get(&action.target);
-        
+
         if let Some(v) = value {
             self.state.working_memory.push(format!("Recalled: {} = {}", action.target, v));
-            
+
             if self.verbose {
                 println!("  📖 Recalled: {} = {}", action.target, v);
             }
         } else if self.verbose {
             println!("  ❓ No memory of: {}", action.target);
         }
-        
+
         Ok(())
     }
-    
+
     fn write_memory(&mut self, action: &Action) -> Result<()> {
         // Write to memory
         if let Some(params) = &action.params {
             if let Some(value) = params.get("value") {
                 self.state.beliefs.insert(action.target.clone(), value.clone());
-                
+
                 if self.verbose {
                     println!("  💾 Stored: {} = {}", action.target, value);
                 }
             }
         }
-        
+
         Ok(())
     }
-    
+
     fn create_concept(&mut self, action: &Action) -> Result<()> {
         // Create a new concept/idea
         self.state.thoughts.push(format!("Conceived of: {}", action.target));
@@ -354,57 +365,57 @@ impl BrainSimulator {
             format!("concept.{}", action.target),
             serde_json::json!({"exists": true})
         );
-        
+
         if self.verbose {
             println!("  💡 Created concept: {}", action.target);
         }
-        
+
         Ok(())
     }
-    
+
     fn bind_concept(&mut self, action: &Action) -> Result<()> {
         // Bind a concept to a value (mental variable)
         if let Some(params) = &action.params {
             if let Some(value) = params.get("value") {
                 self.state.beliefs.insert(action.target.clone(), value.clone());
-                
+
                 if self.verbose {
                     println!("  🔗 Bound: {} = {}", action.target, value);
                 }
             }
         }
-        
+
         Ok(())
     }
-    
+
     fn create_obligation(&mut self, action: &Action) -> Result<()> {
         // Create an obligation/commitment
         if let Some(params) = &action.params {
             if let Some(duty) = params.get("duty").and_then(|v| v.as_str()) {
                 self.state.goals.push(format!("Must: {}", duty));
-                
+
                 // Obligations can create stress/emotion
                 *self.state.emotions.entry("responsibility".to_string()).or_insert(0.0) += 0.5;
-                
+
                 if self.verbose {
                     println!("  ⚖️  Obligation: {}", duty);
                 }
             }
         }
-        
+
         Ok(())
     }
-    
+
     fn wait(&mut self, action: &Action) -> Result<()> {
         // Simulate waiting (time passing)
         let duration = action.dur.unwrap_or(1.0);
-        
+
         self.state.thoughts.push(format!("Waiting for {:.1}s", duration));
-        
+
         if self.verbose {
             println!("  ⏳ Waiting: {:.1}s", duration);
         }
-        
+
         Ok(())
     }
 }
@@ -418,48 +429,48 @@ impl Default for BrainSimulator {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_store_fact() {
         let mut brain = BrainSimulator::new();
         let mut params = HashMap::new();
         params.insert("color".to_string(), serde_json::json!("black"));
-        
+
         let action = Action::new("listener", Operation::StoreFact, "cat")
             .with_params(params);
-        
+
         brain.execute_action(&action).unwrap();
-        
+
         assert!(brain.state.beliefs.contains_key("cat.color"));
         assert_eq!(brain.state.beliefs.get("cat.color").unwrap(), "black");
     }
-    
+
     #[test]
     fn test_emit() {
         let mut brain = BrainSimulator::new();
         let mut params = HashMap::new();
         params.insert("content".to_string(), serde_json::json!("Hello!"));
-        
+
         let action = Action::new("speaker", Operation::Emit, "greeting")
             .with_params(params);
-        
+
         brain.execute_action(&action).unwrap();
-        
+
         assert_eq!(brain.state.output.len(), 1);
         assert_eq!(brain.state.output[0], "Hello!");
     }
-    
+
     #[test]
     fn test_decide() {
         let mut brain = BrainSimulator::new();
         let mut params = HashMap::new();
         params.insert("choice".to_string(), serde_json::json!("go left"));
-        
+
         let action = Action::new("decider", Operation::Decide, "path")
             .with_params(params);
-        
+
         brain.execute_action(&action).unwrap();
-        
+
         assert!(!brain.state.thoughts.is_empty());
     }
 }

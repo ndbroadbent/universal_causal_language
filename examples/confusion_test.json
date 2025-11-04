@@ -1,0 +1,41 @@
+{
+  "metadata": {
+    "domain": "test",
+    "description": "Test brain's response to unknown operations"
+  },
+  "actions": [
+    {
+      "actor": "listener",
+      "op": "StoreFact",
+      "target": "sky",
+      "params": {
+        "color": "blue"
+      }
+    },
+    {
+      "actor": "teacher",
+      "op": "Transcribe",
+      "target": "DNA",
+      "params": {
+        "sequence": "ATCG"
+      }
+    },
+    {
+      "actor": "listener",
+      "op": "Emit",
+      "target": "response",
+      "params": {
+        "content": "I understood the first part"
+      }
+    },
+    {
+      "actor": "system",
+      "op": "Delete",
+      "target": "temporary_file",
+      "params": {
+        "path": "/tmp/data"
+      }
+    }
+  ]
+}
+

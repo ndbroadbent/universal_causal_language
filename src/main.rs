@@ -2,7 +2,7 @@ use clap::{Parser, Subcommand};
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
-use ucl::{Program, compiler::RubyCompiler};
+use ucl::{Program, compiler::RubyCompiler, simulator::BrainSimulator};
 
 #[derive(Parser)]
 #[command(name = "ucl")]
@@ -45,29 +45,43 @@ enum Commands {
         /// Path to the UCL file
         file: PathBuf,
     },
-    
+
     /// Compile a UCL program to another language
     Compile {
         /// Path to the UCL file
         file: PathBuf,
-        
+
         /// Target language (currently only ruby)
         #[arg(short, long, default_value = "ruby")]
         target: String,
-        
+
         /// Output file (optional, defaults to stdout)
         #[arg(short, long)]
         output: Option<PathBuf>,
     },
-    
+
     /// Compile and run a UCL program
     Run {
         /// Path to the UCL file
         file: PathBuf,
-        
-        /// Target language (currently only ruby)
+
+        /// Target language (ruby or brain)
         #[arg(short, long, default_value = "ruby")]
         target: String,
+
+        /// Verbose output
+        #[arg(short, long)]
+        verbose: bool,
+    },
+
+    /// Simulate execution on a virtual human brain
+    Brain {
+        /// Path to the UCL file
+        file: PathBuf,
+
+        /// Verbose output showing each cognitive operation
+        #[arg(short, long)]
+        verbose: bool,
     },
 }
 
@@ -117,7 +131,7 @@ fn main() {
                 }
             }
         }
-        
+
         Commands::Compile { file, target, output } => {
             match compile_file(file, target, output.as_ref()) {
                 Ok(_) => std::process::exit(0),
@@ -127,9 +141,19 @@ fn main() {
                 }
             }
         }
-        
-        Commands::Run { file, target } => {
-            match run_file(file, target) {
+
+        Commands::Run { file, target, verbose } => {
+            match run_file(file, target, *verbose) {
+                Ok(_) => std::process::exit(0),
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    std::process::exit(1);
+                }
+            }
+        }
+
+        Commands::Brain { file, verbose } => {
+            match brain_simulate(file, *verbose) {
                 Ok(_) => std::process::exit(0),
                 Err(e) => {
                     eprintln!("Error: {}", e);
@@ -267,13 +291,13 @@ fn analyze_file(path: &PathBuf) -> anyhow::Result<()> {
             println!("  Time range: {} to {}", min, max);
         }
     }
-    
+
     Ok(())
 }
 
 fn compile_file(path: &PathBuf, target: &str, output: Option<&PathBuf>) -> anyhow::Result<()> {
     let program = validate_file(path)?;
-    
+
     let code = match target {
         "ruby" => {
             let mut compiler = RubyCompiler::new();
@@ -283,61 +307,88 @@ fn compile_file(path: &PathBuf, target: &str, output: Option<&PathBuf>) -> anyho
             anyhow::bail!("Unsupported target language: {}. Currently only 'ruby' is supported.", target);
         }
     };
-    
+
     if let Some(output_path) = output {
         fs::write(output_path, code)?;
         println!("Compiled to {}", output_path.display());
     } else {
         println!("{}", code);
     }
-    
+
     Ok(())
 }
 
-fn run_file(path: &PathBuf, target: &str) -> anyhow::Result<()> {
+fn run_file(path: &PathBuf, target: &str, verbose: bool) -> anyhow::Result<()> {
     let program = validate_file(path)?;
-    
+
     match target {
+        "brain" => {
+            let mut simulator = BrainSimulator::new().with_verbose(verbose);
+            simulator.execute(&program)?;
+
+            println!("\n{}", simulator.state().display());
+        }
         "ruby" => {
             let mut compiler = RubyCompiler::new();
             let code = compiler.compile(&program)?;
-            
+
             // Check if ruby is available
             let ruby_check = Command::new("ruby")
                 .arg("--version")
                 .output();
-            
+
             if ruby_check.is_err() {
                 anyhow::bail!("Ruby is not installed or not in PATH. Please install Ruby to run UCL programs.");
             }
-            
+
             println!("=== Compiled Ruby Code ===");
             println!("{}", code);
             println!("\n=== Execution Output ===");
-            
+
             // Execute the Ruby code
             let output = Command::new("ruby")
                 .arg("-e")
                 .arg(&code)
                 .output()?;
-            
+
             if !output.stdout.is_empty() {
                 print!("{}", String::from_utf8_lossy(&output.stdout));
             }
-            
+
             if !output.stderr.is_empty() {
                 eprint!("{}", String::from_utf8_lossy(&output.stderr));
             }
-            
+
             if !output.status.success() {
                 anyhow::bail!("Ruby execution failed with status: {}", output.status);
             }
         }
         _ => {
-            anyhow::bail!("Unsupported target language: {}. Currently only 'ruby' is supported.", target);
+            anyhow::bail!("Unsupported target language: {}. Currently 'ruby' and 'brain' are supported.", target);
         }
     }
-    
+
+    Ok(())
+}
+
+fn brain_simulate(path: &PathBuf, verbose: bool) -> anyhow::Result<()> {
+    let program = validate_file(path)?;
+
+    let mut simulator = BrainSimulator::new().with_verbose(verbose);
+
+    println!("🧠 Simulating language execution on virtual human brain...\n");
+
+    simulator.execute(&program)?;
+
+    println!("\n{}", simulator.state().display());
+
+    if !simulator.state().trace.is_empty() {
+        println!("Execution Trace:");
+        for (i, step) in simulator.state().trace.iter().enumerate() {
+            println!("  {}. {}", i + 1, step);
+        }
+    }
+
     Ok(())
 }
 

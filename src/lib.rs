@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub mod compiler;
+pub mod simulator;
 
 /// Core operation types in UCL
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -48,6 +49,11 @@ pub enum Operation {
 
     // Custom operation for extensibility
     Custom(String),
+
+    // Intentionally unsupported operations - for testing comprehension limits
+    Flurble,  // A nonsense operation
+    Grok,     // Deep understanding (not yet implemented)
+    Defenestrate,  // A real word but intentionally not supported
 }
 
 /// A UCL Action represents a single causal event

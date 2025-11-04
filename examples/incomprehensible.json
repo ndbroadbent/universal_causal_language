@@ -1,0 +1,92 @@
+{
+  "metadata": {
+    "domain": "natural_language",
+    "description": "Testing brain comprehension limits - uses operations the brain doesn't understand",
+    "purpose": "Demonstrate how the brain simulator responds to unfamiliar concepts"
+  },
+  "actions": [
+    {
+      "actor": "speaker",
+      "op": "Emit",
+      "target": "greeting",
+      "params": {
+        "content": "Hello, can you understand me?"
+      }
+    },
+    {
+      "actor": "listener_brain",
+      "op": "Receive",
+      "target": "greeting",
+      "params": {
+        "content": "Hello, can you understand me?"
+      }
+    },
+    {
+      "actor": "listener_brain",
+      "op": "StoreFact",
+      "target": "speaker",
+      "params": {
+        "is_greeting": true,
+        "friendly": true
+      }
+    },
+    {
+      "actor": "speaker",
+      "op": "Emit",
+      "target": "instruction",
+      "params": {
+        "content": "Please flurble the quantum matrix"
+      }
+    },
+    {
+      "actor": "listener_brain",
+      "op": "Flurble",
+      "target": "quantum_matrix",
+      "params": {
+        "intensity": "high",
+        "direction": "omnidirectional"
+      }
+    },
+    {
+      "actor": "listener_brain",
+      "op": "Emit",
+      "target": "response",
+      "params": {
+        "content": "[Brain tries to respond but is confused]"
+      }
+    },
+    {
+      "actor": "speaker",
+      "op": "Emit",
+      "target": "clarification",
+      "params": {
+        "content": "Can you grok this concept?"
+      }
+    },
+    {
+      "actor": "listener_brain",
+      "op": "Grok",
+      "target": "concept",
+      "params": {
+        "depth": "complete"
+      }
+    },
+    {
+      "actor": "speaker",
+      "op": "Emit",
+      "target": "final_instruction",
+      "params": {
+        "content": "Never mind, just remember: cats are nice"
+      }
+    },
+    {
+      "actor": "listener_brain",
+      "op": "StoreFact",
+      "target": "cats",
+      "params": {
+        "attribute": "nice"
+      }
+    }
+  ]
+}
+
