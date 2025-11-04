@@ -1,0 +1,88 @@
+{
+  "metadata": {
+    "domain": "programming",
+    "language": "Rust",
+    "description": "Rust program translated to UCL",
+    "source_code": "fn main() {\n    let x = 5;\n    let y = increment(x);\n    println!(\"{}\", y);\n}\n\nfn increment(n: i32) -> i32 {\n    n + 1\n}"
+  },
+  "actions": [
+    {
+      "actor": "Runtime",
+      "op": "Call",
+      "target": "main",
+      "params": {},
+      "effects": ["CPU"]
+    },
+    {
+      "actor": "Runtime",
+      "op": "Bind",
+      "target": "x",
+      "params": {
+        "value": 5,
+        "type": "i32"
+      },
+      "effects": ["Stack"]
+    },
+    {
+      "actor": "Runtime",
+      "op": "Call",
+      "target": "increment",
+      "params": {
+        "n": 5
+      },
+      "effects": ["CPU"]
+    },
+    {
+      "actor": "Runtime",
+      "op": "Call",
+      "target": "+",
+      "params": {
+        "lhs": 5,
+        "rhs": 1
+      },
+      "effects": ["ALU"]
+    },
+    {
+      "actor": "Runtime",
+      "op": "Return",
+      "target": "increment",
+      "params": {
+        "value": 6
+      },
+      "effects": ["Stack"]
+    },
+    {
+      "actor": "Runtime",
+      "op": "Bind",
+      "target": "y",
+      "params": {
+        "value": 6,
+        "type": "i32"
+      },
+      "effects": ["Stack"]
+    },
+    {
+      "actor": "Runtime",
+      "op": "Call",
+      "target": "println!",
+      "params": {
+        "format": "{}",
+        "args": [6]
+      },
+      "effects": ["IO"]
+    },
+    {
+      "actor": "Runtime",
+      "op": "Unbind",
+      "target": "y",
+      "effects": ["Stack"]
+    },
+    {
+      "actor": "Runtime",
+      "op": "Unbind",
+      "target": "x",
+      "effects": ["Stack"]
+    }
+  ]
+}
+

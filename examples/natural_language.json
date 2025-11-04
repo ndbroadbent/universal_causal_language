@@ -1,0 +1,57 @@
+{
+  "metadata": {
+    "domain": "natural_language",
+    "description": "Examples of English sentences expressed as UCL actions",
+    "source": "Natural language"
+  },
+  "actions": [
+    {
+      "actor": "listener_brain",
+      "op": "StoreFact",
+      "target": "cat",
+      "params": {
+        "color": "black"
+      }
+    },
+    {
+      "actor": "listener_brain",
+      "op": "StoreFact",
+      "target": "dog",
+      "params": {
+        "action": "barking",
+        "location": "yard"
+      }
+    },
+    {
+      "actor": "speaker",
+      "op": "Emit",
+      "target": "message",
+      "params": {
+        "content": "Hello, world!",
+        "intent": "greeting"
+      },
+      "effects": ["Communication"]
+    },
+    {
+      "actor": "teacher",
+      "op": "Assert",
+      "target": "fact",
+      "params": {
+        "statement": "Water boils at 100°C",
+        "context": "standard_pressure"
+      },
+      "effects": ["Education"]
+    },
+    {
+      "actor": "parent",
+      "op": "Oblige",
+      "target": "child",
+      "params": {
+        "duty": "clean_room",
+        "deadline": "tonight"
+      },
+      "effects": ["Social"]
+    }
+  ]
+}
+

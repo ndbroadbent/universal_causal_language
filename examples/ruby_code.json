@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "domain": "programming",
+    "language": "Ruby",
+    "description": "Simple Ruby program translated to UCL",
+    "source_code": "def add(a, b)\n  result = a + b\n  puts result\n  result\nend\n\nadd(2, 3)"
+  },
+  "actions": [
+    {
+      "actor": "VM",
+      "op": "Call",
+      "target": "add",
+      "params": {
+        "a": 2,
+        "b": 3
+      },
+      "effects": ["CPU"]
+    },
+    {
+      "actor": "VM",
+      "op": "Call",
+      "target": "+",
+      "params": {
+        "lhs": 2,
+        "rhs": 3,
+        "receiver": "a"
+      },
+      "effects": ["CPU"]
+    },
+    {
+      "actor": "VM",
+      "op": "Assign",
+      "target": "result",
+      "params": {
+        "value": 5
+      },
+      "effects": ["Memory"]
+    },
+    {
+      "actor": "VM",
+      "op": "Call",
+      "target": "puts",
+      "params": {
+        "arg": 5
+      },
+      "effects": ["IO"]
+    },
+    {
+      "actor": "VM",
+      "op": "Return",
+      "target": "add",
+      "params": {
+        "value": 5
+      },
+      "effects": ["CPU"]
+    }
+  ]
+}
+

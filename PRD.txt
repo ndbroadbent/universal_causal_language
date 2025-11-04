@@ -1,0 +1,131 @@
+### 1. Overview
+
+The **Universal Causal Language (UCL)** is an experimental intermediate representation (IR) designed to express **causality** across all domains: natural language, programming, law, biology, and art. The language aims to unify all systems of meaning by reducing them to their **causal primitives** — actions that cause state changes.
+
+UCL treats every statement, instruction, law, or behavior as a causal operation: a structured mapping from one state of the world to another. It can encode a function call in a programming language, a sentence in English, a legal contract, a musical score, or a DNA transcription event in the same underlying schema.
+
+---
+
+### 2. Motivation
+
+Current systems for encoding meaning (source code, natural language, logic, policy, etc.) all describe **cause and effect**, but each does so in its own domain-specific format. This fragmentation prevents cross-domain reasoning, translation, and automation.
+
+UCL's goal is to define a **minimal, lossless representation of causality** that can:
+
+* Represent events, instructions, or declarations across arbitrary domains.
+* Preserve both logical structure and human-intended semantics.
+* Serve as a bridge between machine-executable code and human-readable meaning.
+
+---
+
+### 3. Core Hypothesis
+
+Language *is* code, and all forms of communication are **causal programs** executed on different substrates (brains, CPUs, societies, etc.). Therefore, a sufficiently expressive and low-level causal IR can unify all forms of structured communication and computation.
+
+---
+
+### 4. Core Data Model
+
+Each UCL instruction is an **Action** object with a consistent schema:
+
+```
+Action = {
+  actor: <entity>,            # who or what initiates the cause
+  op: <operation>,            # what kind of action occurs
+  target: <entity>,           # what is acted upon
+  t: <timestamp>,             # when the action occurs
+  dur: <duration>,            # how long it lasts (optional)
+  params: <key-value map>,    # contextual arguments
+  pre: <predicate>,           # required preconditions (optional)
+  post: <predicate>,          # resulting conditions (optional)
+  effects: [<tags>]           # domain tags: [Audio, Legal, Bio, etc.]
+}
+```
+
+#### Example: Natural Language
+
+English sentence: *“The cat is black.”*
+
+```
+{actor: "listener_brain", op: "store_fact", target: "cat", params:{color:"black"}}
+```
+
+#### Example: Programming (Ruby)
+
+```
+{actor: "VM", op: "Call", target: "Add", params:{lhs:1, rhs:2, out:"sum"}, effects:["CPU"]}
+```
+
+#### Example: Legal Contract
+
+```
+{actor: "Buyer", op: "Oblige", target: "Buyer", params:{duty:"Pay", amount:"1000 USD", by:"Delivery+5d"}, effects:["Legal"]}
+```
+
+#### Example: Music
+
+```
+{actor:"Piano1", op:"Emit", target:"Note", t:0.0, dur:0.5, params:{pitch:"C4", velocity:90}, effects:["Audio"]}
+```
+
+#### Example: Biology
+
+```
+{actor:"Ribosome", op:"Translate", target:"mRNA:MYC", params:{product:"Protein:MYC"}, effects:["Bio"]}
+```
+
+---
+
+### 5. Design Goals
+
+* **Minimalism:** Use the smallest possible set of primitives (Create, Read, Write, Delete, Bind, Unbind, Emit, Receive, Measure, Decide, Wait, Assert, Oblige, Permit, Remedy, Transcribe, Translate, Express).
+* **Cross-domain consistency:** Every domain adapter (language, legal, biological, musical) maps into the same Action schema.
+* **Information preservation:** UCL should be lossless and round-trippable to the source form when possible.
+* **Human-aligned semantics:** UCL can encode human and machine meaning symmetrically.
+* **Interoperability:** Serve as a lingua franca between LLMs, symbolic systems, compilers, and domain simulators.
+
+---
+
+### 6. Example Applications
+
+1. **AI training:** Train models on UCL graphs rather than plain text, letting them learn explicit cause-effect relations.
+2. **Cross-domain compilation:** Convert Ruby code to legal contracts, or music to code, by transforming shared causal graphs.
+3. **Explainable AI:** Trace AI reasoning as a UCL causal graph.
+4. **Knowledge representation:** Replace plain-text knowledge graphs with UCL actions.
+5. **Cognitive modeling:** Model thought as causal programs executed by neural interpreters.
+
+---
+
+### 7. Implementation Phases
+
+**Phase 1:** Define JSON Schema for UCL core primitives and build adapters for:
+
+* Natural language ↔ UCL
+* Ruby subset ↔ UCL
+* MIDI ↔ UCL
+* Simple contract clauses ↔ UCL
+
+**Phase 2:** Build UCL-to-UCL translators (cross-domain compilers):
+
+* Ruby → UCL → Rust
+* English → UCL → legal logic → smart contracts
+
+**Phase 3:** Train a prototype LLM on mixed-domain UCL datasets.
+
+* Evaluate performance on causal reasoning, translation, and program synthesis.
+
+---
+
+### 8. Open Research Questions
+
+* How to preserve context and intentionality (e.g., irony, aesthetics, morality) in causal form?
+* Can UCL represent stochastic or quantum causality faithfully?
+* What level of granularity makes UCL both human-readable and machine-precise?
+* Could a universal causal grammar enable *cross-domain alignment* of AGI models?
+
+---
+
+### 9. Vision
+
+UCL is not just a programming language or markup system; it is a **causal grammar of reality**.
+It aims to give both humans and machines a common way to describe and exchange the fundamental logic of change itself — a shared representation for all forms of causation, from code to cognition.

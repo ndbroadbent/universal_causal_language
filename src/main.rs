@@ -1,0 +1,228 @@
+use clap::{Parser, Subcommand};
+use std::fs;
+use std::path::PathBuf;
+use ucl::Program;
+
+#[derive(Parser)]
+#[command(name = "ucl")]
+#[command(about = "Universal Causal Language CLI", long_about = None)]
+struct Cli {
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    /// Validate a UCL file
+    Validate {
+        /// Path to the UCL file
+        file: PathBuf,
+    },
+
+    /// Display a UCL file in human-readable format
+    Display {
+        /// Path to the UCL file
+        file: PathBuf,
+
+        /// Show compact output
+        #[arg(short, long)]
+        compact: bool,
+    },
+
+    /// Convert a UCL file to a different format
+    Convert {
+        /// Path to the UCL file
+        file: PathBuf,
+
+        /// Output format (currently only json)
+        #[arg(short, long, default_value = "json")]
+        format: String,
+    },
+
+    /// Analyze a UCL program
+    Analyze {
+        /// Path to the UCL file
+        file: PathBuf,
+    },
+}
+
+fn main() {
+    let cli = Cli::parse();
+
+    match &cli.command {
+        Commands::Validate { file } => {
+            match validate_file(file) {
+                Ok(_) => {
+                    println!("✓ Valid UCL program");
+                    std::process::exit(0);
+                }
+                Err(e) => {
+                    eprintln!("✗ Validation error: {}", e);
+                    std::process::exit(1);
+                }
+            }
+        }
+
+        Commands::Display { file, compact } => {
+            match display_file(file, *compact) {
+                Ok(_) => std::process::exit(0),
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    std::process::exit(1);
+                }
+            }
+        }
+
+        Commands::Convert { file, format } => {
+            match convert_file(file, format) {
+                Ok(_) => std::process::exit(0),
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    std::process::exit(1);
+                }
+            }
+        }
+
+        Commands::Analyze { file } => {
+            match analyze_file(file) {
+                Ok(_) => std::process::exit(0),
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    std::process::exit(1);
+                }
+            }
+        }
+    }
+}
+
+fn validate_file(path: &PathBuf) -> anyhow::Result<Program> {
+    let content = fs::read_to_string(path)?;
+    let program = Program::from_json(&content)?;
+    Ok(program)
+}
+
+fn display_file(path: &PathBuf, compact: bool) -> anyhow::Result<()> {
+    let program = validate_file(path)?;
+
+    if compact {
+        println!("{}", serde_json::to_string(&program)?);
+    } else {
+        if let Some(metadata) = &program.metadata {
+            println!("=== Metadata ===");
+            for (key, value) in metadata {
+                println!("  {}: {}", key, value);
+            }
+            println!();
+        }
+
+        println!("=== Actions ({}) ===", program.actions.len());
+        for (i, action) in program.actions.iter().enumerate() {
+            println!("\n[{}] {:?}", i, action.op);
+            println!("  Actor:  {}", action.actor);
+            println!("  Target: {}", action.target);
+
+            if let Some(t) = action.t {
+                println!("  Time:   {}", t);
+            }
+
+            if let Some(dur) = action.dur {
+                println!("  Duration: {}", dur);
+            }
+
+            if let Some(params) = &action.params {
+                println!("  Parameters:");
+                for (key, value) in params {
+                    println!("    {}: {}", key, value);
+                }
+            }
+
+            if let Some(effects) = &action.effects {
+                println!("  Effects: [{}]", effects.join(", "));
+            }
+        }
+    }
+
+    Ok(())
+}
+
+fn convert_file(path: &PathBuf, format: &str) -> anyhow::Result<()> {
+    let program = validate_file(path)?;
+
+    match format {
+        "json" => {
+            println!("{}", program.to_json()?);
+        }
+        _ => {
+            anyhow::bail!("Unsupported format: {}. Currently only 'json' is supported.", format);
+        }
+    }
+
+    Ok(())
+}
+
+fn analyze_file(path: &PathBuf) -> anyhow::Result<()> {
+    let program = validate_file(path)?;
+
+    println!("=== UCL Program Analysis ===\n");
+    println!("Total actions: {}", program.actions.len());
+
+    // Count operations
+    let mut op_counts = std::collections::HashMap::new();
+    for action in &program.actions {
+        *op_counts.entry(format!("{:?}", action.op)).or_insert(0) += 1;
+    }
+
+    println!("\nOperation distribution:");
+    let mut ops: Vec<_> = op_counts.iter().collect();
+    ops.sort_by_key(|(_, count)| std::cmp::Reverse(**count));
+    for (op, count) in ops {
+        println!("  {}: {}", op, count);
+    }
+
+    // Count actors
+    let mut actor_counts = std::collections::HashMap::new();
+    for action in &program.actions {
+        *actor_counts.entry(&action.actor).or_insert(0) += 1;
+    }
+
+    println!("\nTop actors:");
+    let mut actors: Vec<_> = actor_counts.iter().collect();
+    actors.sort_by_key(|(_, count)| std::cmp::Reverse(**count));
+    for (actor, count) in actors.iter().take(10) {
+        println!("  {}: {}", actor, count);
+    }
+
+    // Effects domains
+    let mut domain_counts = std::collections::HashMap::new();
+    for action in &program.actions {
+        if let Some(effects) = &action.effects {
+            for effect in effects {
+                *domain_counts.entry(effect).or_insert(0) += 1;
+            }
+        }
+    }
+
+    if !domain_counts.is_empty() {
+        println!("\nDomain tags:");
+        for (domain, count) in domain_counts.iter() {
+            println!("  {}: {}", domain, count);
+        }
+    }
+
+    // Temporal analysis
+    let timed_actions = program.actions.iter().filter(|a| a.t.is_some()).count();
+    if timed_actions > 0 {
+        println!("\nTemporal analysis:");
+        println!("  Actions with timestamps: {}", timed_actions);
+
+        let times: Vec<f64> = program.actions.iter().filter_map(|a| a.t).collect();
+        if !times.is_empty() {
+            let min = times.iter().fold(f64::INFINITY, |a, &b| a.min(b));
+            let max = times.iter().fold(f64::NEG_INFINITY, |a, &b| a.max(b));
+            println!("  Time range: {} to {}", min, max);
+        }
+    }
+
+    Ok(())
+}
+

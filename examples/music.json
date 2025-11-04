@@ -1,0 +1,107 @@
+{
+  "metadata": {
+    "domain": "music",
+    "description": "A simple C major scale represented as UCL actions",
+    "tempo": 120,
+    "key": "C Major"
+  },
+  "actions": [
+    {
+      "actor": "Piano1",
+      "op": "Emit",
+      "target": "Note",
+      "t": 0.0,
+      "dur": 0.5,
+      "params": {
+        "pitch": "C4",
+        "velocity": 80
+      },
+      "effects": ["Audio"]
+    },
+    {
+      "actor": "Piano1",
+      "op": "Emit",
+      "target": "Note",
+      "t": 0.5,
+      "dur": 0.5,
+      "params": {
+        "pitch": "D4",
+        "velocity": 82
+      },
+      "effects": ["Audio"]
+    },
+    {
+      "actor": "Piano1",
+      "op": "Emit",
+      "target": "Note",
+      "t": 1.0,
+      "dur": 0.5,
+      "params": {
+        "pitch": "E4",
+        "velocity": 85
+      },
+      "effects": ["Audio"]
+    },
+    {
+      "actor": "Piano1",
+      "op": "Emit",
+      "target": "Note",
+      "t": 1.5,
+      "dur": 0.5,
+      "params": {
+        "pitch": "F4",
+        "velocity": 80
+      },
+      "effects": ["Audio"]
+    },
+    {
+      "actor": "Piano1",
+      "op": "Emit",
+      "target": "Note",
+      "t": 2.0,
+      "dur": 0.5,
+      "params": {
+        "pitch": "G4",
+        "velocity": 90
+      },
+      "effects": ["Audio"]
+    },
+    {
+      "actor": "Piano1",
+      "op": "Emit",
+      "target": "Note",
+      "t": 2.5,
+      "dur": 0.5,
+      "params": {
+        "pitch": "A4",
+        "velocity": 88
+      },
+      "effects": ["Audio"]
+    },
+    {
+      "actor": "Piano1",
+      "op": "Emit",
+      "target": "Note",
+      "t": 3.0,
+      "dur": 0.5,
+      "params": {
+        "pitch": "B4",
+        "velocity": 85
+      },
+      "effects": ["Audio"]
+    },
+    {
+      "actor": "Piano1",
+      "op": "Emit",
+      "target": "Note",
+      "t": 3.5,
+      "dur": 1.0,
+      "params": {
+        "pitch": "C5",
+        "velocity": 95
+      },
+      "effects": ["Audio"]
+    }
+  ]
+}
+

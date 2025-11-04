@@ -1,0 +1,70 @@
+{
+  "metadata": {
+    "domain": "legal",
+    "description": "A simple purchase agreement expressed as UCL obligations",
+    "contract_type": "Purchase Agreement",
+    "date": "2025-11-04"
+  },
+  "actions": [
+    {
+      "actor": "Buyer",
+      "op": "Oblige",
+      "target": "Buyer",
+      "params": {
+        "duty": "Pay",
+        "amount": "1000 USD",
+        "by": "Delivery+5d"
+      },
+      "pre": "Goods delivered and inspected",
+      "effects": ["Legal"]
+    },
+    {
+      "actor": "Seller",
+      "op": "Oblige",
+      "target": "Seller",
+      "params": {
+        "duty": "Deliver",
+        "item": "Widget Pro 3000",
+        "quantity": 1,
+        "by": "2025-11-15"
+      },
+      "pre": "Order confirmed",
+      "post": "Goods in buyer possession",
+      "effects": ["Legal"]
+    },
+    {
+      "actor": "Seller",
+      "op": "Permit",
+      "target": "Buyer",
+      "params": {
+        "right": "Inspect",
+        "item": "Widget Pro 3000",
+        "duration": "5 days"
+      },
+      "effects": ["Legal"]
+    },
+    {
+      "actor": "Buyer",
+      "op": "Permit",
+      "target": "Buyer",
+      "params": {
+        "right": "Return",
+        "condition": "Defective or not as described",
+        "window": "30 days"
+      },
+      "effects": ["Legal"]
+    },
+    {
+      "actor": "Seller",
+      "op": "Oblige",
+      "target": "Seller",
+      "params": {
+        "duty": "Remedy",
+        "condition": "If defective",
+        "actions": ["Replace", "Refund"]
+      },
+      "effects": ["Legal"]
+    }
+  ]
+}
+

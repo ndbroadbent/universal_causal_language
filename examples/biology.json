@@ -1,0 +1,92 @@
+{
+  "metadata": {
+    "domain": "biology",
+    "description": "Central Dogma of Molecular Biology - DNA to Protein",
+    "organism": "Human",
+    "gene": "MYC"
+  },
+  "actions": [
+    {
+      "actor": "RNA_Polymerase_II",
+      "op": "Transcribe",
+      "target": "DNA:MYC",
+      "params": {
+        "product": "pre-mRNA:MYC",
+        "location": "nucleus"
+      },
+      "pre": "Promoter accessible",
+      "post": "Pre-mRNA synthesized",
+      "effects": ["Bio", "Nucleus"]
+    },
+    {
+      "actor": "Spliceosome",
+      "op": {
+        "Custom": "Splice"
+      },
+      "target": "pre-mRNA:MYC",
+      "params": {
+        "remove": "introns",
+        "product": "mRNA:MYC"
+      },
+      "effects": ["Bio", "Nucleus"]
+    },
+    {
+      "actor": "Exportin",
+      "op": {
+        "Custom": "Transport"
+      },
+      "target": "mRNA:MYC",
+      "params": {
+        "from": "nucleus",
+        "to": "cytoplasm"
+      },
+      "effects": ["Bio", "Transport"]
+    },
+    {
+      "actor": "Ribosome",
+      "op": "Translate",
+      "target": "mRNA:MYC",
+      "params": {
+        "product": "Protein:MYC",
+        "location": "cytoplasm"
+      },
+      "pre": "mRNA bound to ribosome",
+      "post": "Protein synthesized",
+      "effects": ["Bio", "Cytoplasm"]
+    },
+    {
+      "actor": "Chaperone",
+      "op": {
+        "Custom": "Fold"
+      },
+      "target": "Protein:MYC",
+      "params": {
+        "conformation": "native"
+      },
+      "effects": ["Bio"]
+    },
+    {
+      "actor": "Karyopherin",
+      "op": {
+        "Custom": "Transport"
+      },
+      "target": "Protein:MYC",
+      "params": {
+        "from": "cytoplasm",
+        "to": "nucleus"
+      },
+      "effects": ["Bio", "Transport"]
+    },
+    {
+      "actor": "Protein:MYC",
+      "op": "Bind",
+      "target": "DNA:E-box",
+      "params": {
+        "function": "transcription_activation",
+        "target_genes": ["CDK4", "CCND1"]
+      },
+      "effects": ["Bio", "Gene_Regulation"]
+    }
+  ]
+}
+
