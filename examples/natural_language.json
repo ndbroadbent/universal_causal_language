@@ -6,18 +6,20 @@
   },
   "actions": [
     {
-      "actor": "listener_brain",
+      "actor": "listener",
       "op": "StoreFact",
-      "target": "cat",
+      "target": "memory",
       "params": {
+        "entity": "cat",
         "color": "black"
       }
     },
     {
-      "actor": "listener_brain",
+      "actor": "listener",
       "op": "StoreFact",
-      "target": "dog",
+      "target": "memory",
       "params": {
+        "entity": "dog",
         "action": "barking",
         "location": "yard"
       }

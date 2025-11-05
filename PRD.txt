@@ -44,10 +44,10 @@ Action = {
 
 #### Example: Natural Language
 
-English sentence: *“The cat is black.”*
+English sentence: *"The cat is black."*
 
 ```
-{actor: "listener_brain", op: "store_fact", target: "cat", params:{color:"black"}}
+{actor: "listener", op: "store_fact", target: "memory", params:{entity:"cat", color:"black"}}
 ```
 
 #### Example: Programming (Ruby)

@@ -7,8 +7,9 @@
     {
       "actor": "listener",
       "op": "StoreFact",
-      "target": "sky",
+      "target": "memory",
       "params": {
+        "entity": "sky",
         "color": "blue"
       }
     },

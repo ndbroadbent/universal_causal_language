@@ -9,7 +9,8 @@ fn test_natural_language_example() {
         .expect("Failed to parse natural_language.json");
 
     assert_eq!(program.actions.len(), 5);
-    assert_eq!(program.actions[0].actor, "listener_brain");
+    assert_eq!(program.actions[0].actor, "listener");
+    assert_eq!(program.actions[0].target, "memory");
 }
 
 #[test]

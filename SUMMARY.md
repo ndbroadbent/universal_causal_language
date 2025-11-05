@@ -105,8 +105,9 @@ STEP 1/3: StoreFact Operation
 📋 Instruction:
    Actor:  you
    Op:     StoreFact
-   Target: elephant
+   Target: memory
    Params:
+     • entity = "elephant"
      • color = "gray"
      • size = "large"
 
@@ -179,7 +180,7 @@ Traditional View:
 "The cat is black" → [Text String] → ???
 
 UCL View:
-"The cat is black" → StoreFact(cat, {color:"black"}) → Brain State Change
+"The cat is black" → StoreFact(target: memory, {entity:"cat", color:"black"}) → Brain State Change
 ```
 
 ### Understanding = Execution

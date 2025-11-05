@@ -196,8 +196,20 @@ impl BrainSimulator {
     fn store_fact(&mut self, action: &Action) -> Result<()> {
         // Store a fact in belief memory
         if let Some(params) = &action.params {
-            for (key, value) in params {
-                let fact_key = format!("{}.{}", action.target, key);
+            // Extract the entity from params (new structure) or fall back to target (old structure)
+            let entity = params.get("entity")
+                .and_then(|v| v.as_str())
+                .unwrap_or(&action.target);
+
+            // Filter out "entity" from properties to store
+            let properties: HashMap<String, serde_json::Value> = params
+                .iter()
+                .filter(|(k, _)| k.as_str() != "entity")
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .collect();
+
+            for (key, value) in &properties {
+                let fact_key = format!("{}.{}", entity, key);
                 self.state.beliefs.insert(fact_key.clone(), value.clone());
 
                 if self.verbose {
@@ -206,14 +218,16 @@ impl BrainSimulator {
             }
 
             // Update working memory
-            let memory_item = format!("The {} has properties: {}",
-                action.target,
-                params.keys().map(|k| k.as_str()).collect::<Vec<_>>().join(", "));
-            self.state.working_memory.push(memory_item);
+            if !properties.is_empty() {
+                let memory_item = format!("The {} has properties: {}",
+                    entity,
+                    properties.keys().map(|k| k.as_str()).collect::<Vec<_>>().join(", "));
+                self.state.working_memory.push(memory_item);
 
-            // Keep working memory limited
-            if self.state.working_memory.len() > 7 {
-                self.state.working_memory.remove(0);
+                // Keep working memory limited
+                if self.state.working_memory.len() > 7 {
+                    self.state.working_memory.remove(0);
+                }
             }
         }
         Ok(())
@@ -544,9 +558,10 @@ mod tests {
     fn test_store_fact() {
         let mut brain = BrainSimulator::new();
         let mut params = HashMap::new();
+        params.insert("entity".to_string(), serde_json::json!("cat"));
         params.insert("color".to_string(), serde_json::json!("black"));
 
-        let action = Action::new("listener", Operation::StoreFact, "cat")
+        let action = Action::new("listener", Operation::StoreFact, "memory")
             .with_params(params);
 
         brain.execute_action(&action).unwrap();

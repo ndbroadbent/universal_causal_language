@@ -52,6 +52,7 @@ When the brain encounters an operation it doesn't understand (like `Transcribe`,
 ```
 
 This increases:
+
 - **Confusion** emotion (+0.4)
 - **Curiosity** emotion (+0.3)
 
@@ -102,28 +103,32 @@ Output/Speech:
 ## Natural Language as Code
 
 ### Traditional View
+
 ```
 "The cat is black"  →  [Text String]  →  Statistical Model  →  ???
 ```
 
 ### UCL Brain VM View
+
 ```
 "The cat is black"  →  UCL Program  →  Brain VM  →  Updated Brain State
 ```
 
 The sentence becomes:
+
 ```json
 {
-  "actor": "listener_brain",
+  "actor": "listener",
   "op": "StoreFact",
-  "target": "cat",
-  "params": {"color": "black"}
+  "target": "memory",
+  "params": { "entity": "cat", "color": "black" }
 }
 ```
 
 Which executes as:
-1. Access belief storage
-2. Create entry: `cat.color = "black"`
+
+1. Access memory subsystem (target)
+2. Store entity and properties: `cat.color = "black"`
 3. Add to working memory
 4. Update emotional state (if relevant)
 
@@ -136,6 +141,7 @@ Understanding isn't recognition—it's **successful execution**. If the brain ca
 ### 2. Cross-Substrate Compilation
 
 Since language is just a program, we can:
+
 - **Compile UCL → Ruby**: Execute on Ruby VM
 - **Compile UCL → Brain**: Execute on brain VM
 - **Compile UCL → Rust**: Execute on native code
@@ -147,14 +153,15 @@ The same causal logic, different execution environments.
 Every thought, emotion, and utterance traces back to specific operations:
 
 ```
-StoreFact(cat) → beliefs["cat.color"] = "black"
-Emit(greeting) → output["Hello!"], emotions["warmth"] += 0.3
-Oblige(duty) → goals["clean_room"], emotions["responsibility"] += 0.5
+StoreFact(target: memory, entity: cat) → beliefs["cat.color"] = "black"
+Emit(target: speech) → output["Hello!"], emotions["warmth"] += 0.3
+Oblige(target: goals) → goals["clean_room"], emotions["responsibility"] += 0.5
 ```
 
 ### 4. AGI Training
 
 Instead of training on text, train on **executable brain programs**:
+
 - Learn operations (opcodes)
 - Learn how operations compose
 - Learn effects on brain state
@@ -169,6 +176,7 @@ Cognition is the **computation**, not the substrate. A biological brain and a si
 ### Language as Universal API
 
 Language becomes an API to any cognitive system:
+
 ```
 Human Brain API: natural_language → brain_state
 AI Brain API: natural_language → brain_state
@@ -183,18 +191,21 @@ The subjective experience might be the **what it's like** to be the execution en
 ## Future Directions
 
 1. **Richer Brain State**
+
    - Episodic memory
    - Procedural memory
    - Multiple attention streams
    - Complex emotion models
 
 2. **More Operations**
+
    - Imagine (simulate counterfactuals)
    - Reason (logical inference)
    - Feel (process emotions)
    - Dream (offline processing)
 
 3. **Learning**
+
    - Adapt operation implementations based on experience
    - Form new compound operations
    - Optimize execution patterns
@@ -211,9 +222,9 @@ The subjective experience might be the **what it's like** to be the execution en
 cat > my_language.json << 'EOF'
 {
   "actions": [
-    {"actor": "me", "op": "StoreFact", "target": "UCL",
-     "params": {"property": "mind-blowing"}},
-    {"actor": "me", "op": "Emit", "target": "reaction",
+    {"actor": "me", "op": "StoreFact", "target": "memory",
+     "params": {"entity": "UCL", "property": "mind-blowing"}},
+    {"actor": "me", "op": "Emit", "target": "speech",
      "params": {"content": "This changes everything!"}}
   ]
 }
@@ -224,4 +235,3 @@ ucl brain my_language.json --verbose
 ```
 
 Watch as language literally executes, step by step, on a simulated human brain. 🧠✨
-

@@ -139,10 +139,11 @@ English: _"The cat is black."_
 
 ```json
 {
-  "actor": "listener_brain",
+  "actor": "listener",
   "op": "StoreFact",
-  "target": "cat",
+  "target": "memory",
   "params": {
+    "entity": "cat",
     "color": "black"
   }
 }

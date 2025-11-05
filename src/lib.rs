@@ -204,16 +204,17 @@ mod tests {
     #[test]
     fn test_json_serialization() {
         let mut params = HashMap::new();
+        params.insert("entity".to_string(), serde_json::json!("cat"));
         params.insert("color".to_string(), serde_json::json!("black"));
 
-        let action = Action::new("listener_brain", Operation::StoreFact, "cat")
+        let action = Action::new("listener", Operation::StoreFact, "memory")
             .with_params(params);
 
         let json = serde_json::to_string(&action).unwrap();
         let parsed: Action = serde_json::from_str(&json).unwrap();
 
-        assert_eq!(parsed.actor, "listener_brain");
-        assert_eq!(parsed.target, "cat");
+        assert_eq!(parsed.actor, "listener");
+        assert_eq!(parsed.target, "memory");
     }
 
     #[test]

@@ -49,8 +49,9 @@ STEP 1/3: StoreFact Operation
 📋 Instruction:
    Actor:  you
    Op:     StoreFact
-   Target: elephant
+   Target: memory
    Params:
+     • entity = "elephant"
      • color = "gray"
      • size = "large"
 
@@ -80,7 +81,7 @@ What do you remember? Elephants are gray and large
 
 🧠 Production Brain State Capture:
 ────────────────────────────────────────────────────────────
-Step 1: StoreFact(elephant)
+Step 1: StoreFact(target: memory, entity: elephant)
   Thought: I'm picturing a gray elephant
   Emotion: curious
   Memory: Elephants are gray and large

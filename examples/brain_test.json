@@ -7,8 +7,9 @@
     {
       "actor": "you",
       "op": "StoreFact",
-      "target": "elephant",
+      "target": "memory",
       "params": {
+        "entity": "elephant",
         "color": "gray",
         "size": "large"
       }

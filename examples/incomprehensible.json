@@ -14,7 +14,7 @@
       }
     },
     {
-      "actor": "listener_brain",
+      "actor": "listener",
       "op": "Receive",
       "target": "greeting",
       "params": {
@@ -22,10 +22,11 @@
       }
     },
     {
-      "actor": "listener_brain",
+      "actor": "listener",
       "op": "StoreFact",
-      "target": "speaker",
+      "target": "memory",
       "params": {
+        "entity": "speaker",
         "is_greeting": true,
         "friendly": true
       }
@@ -39,7 +40,7 @@
       }
     },
     {
-      "actor": "listener_brain",
+      "actor": "listener",
       "op": "Flurble",
       "target": "quantum_matrix",
       "params": {
@@ -48,7 +49,7 @@
       }
     },
     {
-      "actor": "listener_brain",
+      "actor": "listener",
       "op": "Emit",
       "target": "response",
       "params": {
@@ -64,7 +65,7 @@
       }
     },
     {
-      "actor": "listener_brain",
+      "actor": "listener",
       "op": "Grok",
       "target": "concept",
       "params": {
@@ -80,10 +81,11 @@
       }
     },
     {
-      "actor": "listener_brain",
+      "actor": "listener",
       "op": "StoreFact",
-      "target": "cats",
+      "target": "memory",
       "params": {
+        "entity": "cats",
         "attribute": "nice"
       }
     }
