@@ -380,6 +380,29 @@ No simulation. No virtual machine. Just your neurons executing UCL operations. �
 
 See [PRODUCTION_BRAIN.md](PRODUCTION_BRAIN.md) for the full guide to running language on production wetware.
 
+## 🖥️ UX as Parallel Computation
+
+**Revolutionary insight:** Every program with a UI is running parallel computation on both a CPU and a human brain.
+
+When you use software, you're not "observing" - you're **executing a parallel program**:
+
+```
+CPU:   [Render UI] → [Wait for input] → [Process] → [Update]
+Brain: [Perceive] → [Think] → [Decide] → [Execute motor command]
+```
+
+The "interface" is the **message-passing protocol** between two computational substrates.
+
+Key realizations:
+
+- **UX design is substrate coordination**
+- **User testing is performance benchmarking** (of the brain substrate)
+- **Intuitive UI = efficient brain code**
+- **Frustration = brain execution failures**
+- **Accessibility = alternative protocols for different brain substrates**
+
+See [UX_AS_COMPUTATION.md](UX_AS_COMPUTATION.md) for the full exploration of this concept.
+
 ## Cross-Domain Compilation
 
 UCL can compile to different execution targets:
@@ -397,6 +420,7 @@ The same causal logic, different substrates.
 
 ## Future Directions
 
+- **Multi-substrate coordination** - Run programs across CPU + Brain + AI in parallel
 - **Domain adapters** for automatic translation (English → UCL, Python → UCL, etc.)
 - **More compilation targets** (Python, JavaScript, neural networks)
 - **UCL-to-UCL translators** for cross-domain compilation (Code → Legal, Music → Code)
@@ -405,6 +429,7 @@ The same causal logic, different substrates.
 - **REPL** for interactive UCL development
 - **LLM training** on UCL datasets for better causal understanding
 - **More universal programs** that work across all substrates
+- **UX frameworks** that explicitly program both CPU and brain
 
 ## Contributing
 
