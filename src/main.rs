@@ -2,7 +2,7 @@ use clap::{Parser, Subcommand};
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
-use ucl::{Program, Operation, compiler::RubyCompiler, simulator::BrainSimulator, coordinator::MultiSubstrateCoordinator};
+use ucl::{Program, Operation, compiler::RubyCompiler, simulator::{BrainSimulator, RobotSimulator}, coordinator::MultiSubstrateCoordinator};
 
 #[derive(Parser)]
 #[command(name = "ucl")]
@@ -88,6 +88,16 @@ enum Commands {
         production: bool,
     },
 
+    /// Simulate execution on a virtual robot
+    Robot {
+        /// Path to the UCL file
+        file: PathBuf,
+
+        /// Verbose output showing each physical operation
+        #[arg(short, long)]
+        verbose: bool,
+    },
+
     /// Execute across multiple substrates in parallel
     Parallel {
         /// Path to the UCL file
@@ -168,6 +178,16 @@ fn main() {
 
         Commands::Brain { file, verbose, production } => {
             match brain_simulate(file, *verbose, *production) {
+                Ok(_) => std::process::exit(0),
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    std::process::exit(1);
+                }
+            }
+        }
+
+        Commands::Robot { file, verbose } => {
+            match robot_simulate(file, *verbose) {
                 Ok(_) => std::process::exit(0),
                 Err(e) => {
                     eprintln!("Error: {}", e);
@@ -416,6 +436,20 @@ fn brain_simulate(path: &PathBuf, verbose: bool, production: bool) -> anyhow::Re
             println!("  {}. {}", i + 1, step);
         }
     }
+
+    Ok(())
+}
+
+fn robot_simulate(path: &PathBuf, verbose: bool) -> anyhow::Result<()> {
+    let program = validate_file(path)?;
+
+    let mut simulator = RobotSimulator::new().with_verbose(verbose);
+
+    println!("🤖 Simulating physical execution on virtual robot...\n");
+
+    simulator.execute(&program)?;
+
+    println!("\n{}", simulator.state().display());
 
     Ok(())
 }

@@ -173,6 +173,18 @@ impl BrainSimulator {
             Operation::Oblige => self.create_obligation(action),
             Operation::Wait => self.wait(action),
             Operation::GenRandomInt => self.gen_random_int(action),
+
+            // Cooking operations - simulated as physical actions
+            Operation::Gather => self.physical_action(action, "👐", "Gathering"),
+            Operation::Heat => self.physical_action(action, "🔥", "Heating"),
+            Operation::Pour => self.physical_action(action, "🫗", "Pouring"),
+            Operation::Mix => self.physical_action(action, "🥄", "Mixing"),
+            Operation::Stir => self.physical_action(action, "🥄", "Stirring"),
+            Operation::Place => self.physical_action(action, "📍", "Placing"),
+            Operation::Remove => self.physical_action(action, "✋", "Removing"),
+            Operation::Steep => self.physical_action(action, "⏱️", "Steeping"),
+            Operation::Serve => self.physical_action(action, "🍽️", "Serving"),
+
             _ => {
                 // Brain encounters something it doesn't understand
                 let confusion = format!("Sorry, I don't know what that means: {:?}", action.op);
@@ -538,6 +550,45 @@ impl BrainSimulator {
 
         if self.verbose {
             println!("  🎲 Generated: {} = {}", action.target, random_num);
+        }
+
+        Ok(())
+    }
+
+    fn physical_action(&mut self, action: &Action, emoji: &str, verb: &str) -> Result<()> {
+        // Simulate performing a physical action
+        let description = if let Some(params) = &action.params {
+            // Build a natural description from params
+            let mut parts = vec![format!("{} {}", verb, action.target)];
+
+            if let Some(from) = params.get("from") {
+                parts.push(format!("from {}", from.as_str().unwrap_or("?")));
+            }
+            if let Some(into) = params.get("into") {
+                parts.push(format!("into {}", into.as_str().unwrap_or("?")));
+            }
+            if let Some(amount) = params.get("amount") {
+                parts.push(format!("({})", amount.as_str().unwrap_or("?")));
+            }
+
+            parts.join(" ")
+        } else {
+            format!("{} {}", verb, action.target)
+        };
+
+        self.state.thoughts.push(format!("Performing action: {}", description));
+
+        // Track the action in working memory
+        self.state.working_memory.push(description.clone());
+        if self.state.working_memory.len() > 7 {
+            self.state.working_memory.remove(0);
+        }
+
+        // Physical actions create mild satisfaction
+        *self.state.emotions.entry("focus".to_string()).or_insert(0.0) += 0.2;
+
+        if self.verbose {
+            println!("  {} {}", emoji, description);
         }
 
         Ok(())

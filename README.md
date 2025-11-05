@@ -224,11 +224,46 @@ DNA transcription:
 }
 ```
 
+### Recipes
+
+A recipe for making tea (runs on Brain VM or Robot VM):
+
+```json
+{
+  "actor": "cook",
+  "op": "Heat",
+  "target": "water",
+  "params": {
+    "container": "kettle",
+    "temperature": "100°C",
+    "until": "boiling"
+  },
+  "dur": 180.0,
+  "effects": ["Thermal"]
+}
+```
+
+**Same recipe, different substrates:**
+
+- **Brain VM**: Simulates a human following the recipe (cognitive operations)
+- **Robot VM**: Simulates a robot executing the recipe (physical operations)
+
+```bash
+# Human brain following the recipe
+ucl brain examples/recipe_tea.json --verbose
+
+# Robot executing the recipe
+ucl robot examples/recipe_tea.json --verbose
+```
+
+This demonstrates **substrate independence** - the same causal logic runs on different execution environments!
+
 ## Example Programs
 
 The `examples/` directory contains complete UCL programs for various domains:
 
 - **multiply_universal.json** ⭐ - Runs on all three substrates!
+- **recipe_tea.json** 🍵 - Runs on Brain VM and Robot VM!
 - **natural_language.json** - English sentences as UCL
 - **ruby_code.json** - Ruby program execution
 - **rust_code.json** - Rust program with memory management
