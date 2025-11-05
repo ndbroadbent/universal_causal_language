@@ -1,0 +1,104 @@
+{
+  "metadata": {
+    "domain": "parallel_computation",
+    "description": "Parallel computation across Ruby VM and Brain VM",
+    "note": "Two substrates working together on the same problem"
+  },
+  "actions": [
+    {
+      "actor": "RubyVM",
+      "op": "GenRandomInt",
+      "target": "ruby_num",
+      "params": {
+        "min": 1,
+        "max": 9
+      },
+      "effects": ["Silicon"]
+    },
+    {
+      "actor": "BrainVM",
+      "op": "GenRandomInt",
+      "target": "brain_num",
+      "params": {
+        "min": 1,
+        "max": 9
+      },
+      "effects": ["Wetware"]
+    },
+    {
+      "actor": "RubyVM",
+      "op": "Write",
+      "target": "ruby_result",
+      "params": {
+        "operation": "multiply",
+        "lhs_register": "ruby_num",
+        "rhs": 2
+      }
+    },
+    {
+      "actor": "BrainVM",
+      "op": "Write",
+      "target": "brain_result",
+      "params": {
+        "operation": "multiply",
+        "lhs_register": "brain_num",
+        "rhs": 3
+      }
+    },
+    {
+      "actor": "RubyVM",
+      "op": "Emit",
+      "target": "ruby_result",
+      "params": {
+        "label": "Ruby computed"
+      }
+    },
+    {
+      "actor": "BrainVM",
+      "op": "Emit",
+      "target": "brain_result",
+      "params": {
+        "label": "Brain computed"
+      }
+    },
+    {
+      "actor": "Coordinator",
+      "op": "Receive",
+      "target": "brain_result",
+      "params": {
+        "source": "BrainVM"
+      },
+      "effects": ["Communication"]
+    },
+    {
+      "actor": "Coordinator",
+      "op": "Emit",
+      "target": "brain_result",
+      "params": {
+        "destination": "RubyVM",
+        "protocol": "InterSubstrate"
+      },
+      "effects": ["Communication"]
+    },
+    {
+      "actor": "RubyVM",
+      "op": "Write",
+      "target": "final_result",
+      "params": {
+        "operation": "add",
+        "lhs_register": "ruby_result",
+        "rhs_register": "brain_result"
+      }
+    },
+    {
+      "actor": "RubyVM",
+      "op": "Emit",
+      "target": "final_result",
+      "params": {
+        "message": "Combined result from Silicon + Wetware"
+      },
+      "effects": ["Output"]
+    }
+  ]
+}
+

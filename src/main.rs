@@ -2,7 +2,7 @@ use clap::{Parser, Subcommand};
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
-use ucl::{Program, Operation, compiler::RubyCompiler, simulator::BrainSimulator};
+use ucl::{Program, Operation, compiler::RubyCompiler, simulator::BrainSimulator, coordinator::MultiSubstrateCoordinator};
 
 #[derive(Parser)]
 #[command(name = "ucl")]
@@ -87,6 +87,16 @@ enum Commands {
         #[arg(short, long)]
         production: bool,
     },
+
+    /// Execute across multiple substrates in parallel
+    Parallel {
+        /// Path to the UCL file
+        file: PathBuf,
+
+        /// Verbose output
+        #[arg(short, long)]
+        verbose: bool,
+    },
 }
 
 fn main() {
@@ -158,6 +168,16 @@ fn main() {
 
         Commands::Brain { file, verbose, production } => {
             match brain_simulate(file, *verbose, *production) {
+                Ok(_) => std::process::exit(0),
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    std::process::exit(1);
+                }
+            }
+        }
+
+        Commands::Parallel { file, verbose } => {
+            match parallel_execute(file, *verbose) {
                 Ok(_) => std::process::exit(0),
                 Err(e) => {
                     eprintln!("Error: {}", e);
@@ -605,6 +625,26 @@ fn run_on_production_brain(program: &Program) -> anyhow::Result<()> {
     println!("   • You are now running UCL in production 🚀");
     println!();
     println!("Thank you for being a biological runtime environment! 🧠✨");
+
+    Ok(())
+}
+
+fn parallel_execute(path: &PathBuf, verbose: bool) -> anyhow::Result<()> {
+    let program = validate_file(path)?;
+
+    println!("🌐 Multi-Substrate Parallel Execution");
+    println!("{}", "=".repeat(60));
+    println!();
+
+    let mut coordinator = MultiSubstrateCoordinator::new().with_verbose(verbose);
+    coordinator.execute(&program)?;
+
+    coordinator.show_results();
+
+    println!("\n{}", "=".repeat(60));
+    println!("✨ Parallel execution complete!");
+    println!("\n💡 Different substrates (Silicon + Wetware) worked together");
+    println!("   on the same problem. This is the future of computing. 🚀");
 
     Ok(())
 }

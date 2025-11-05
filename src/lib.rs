@@ -3,6 +3,7 @@ use std::collections::HashMap;
 
 pub mod compiler;
 pub mod simulator;
+pub mod coordinator;
 
 /// Core operation types in UCL
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]

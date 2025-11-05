@@ -132,13 +132,8 @@ impl RubyCompiler {
 
     fn compile_write(&mut self, action: &Action, indent: &str) -> Result<String> {
         if let Some(params) = &action.params {
-            // Check if it's a computed value from registers
-            if let (Some(lhs_reg), Some(rhs_reg), Some(op)) =
-                (params.get("lhs_register"), params.get("rhs_register"), params.get("operation")) {
-                let lhs_name = lhs_reg.as_str().unwrap_or("");
-                let rhs_name = rhs_reg.as_str().unwrap_or("");
+            if let Some(op) = params.get("operation") {
                 let operation = op.as_str().unwrap_or("");
-
                 let operator = match operation {
                     "multiply" => "*",
                     "add" => "+",
@@ -147,7 +142,25 @@ impl RubyCompiler {
                     _ => "*",
                 };
 
-                return Ok(format!("{}{} = {} {} {}", indent, action.target, lhs_name, operator, rhs_name));
+                // Get left operand (register or value)
+                let lhs = if let Some(lhs_reg) = params.get("lhs_register") {
+                    lhs_reg.as_str().unwrap_or("").to_string()
+                } else if let Some(lhs_val) = params.get("lhs") {
+                    self.value_to_ruby(lhs_val)
+                } else {
+                    return Err(anyhow!("Write operation requires lhs_register or lhs"));
+                };
+
+                // Get right operand (register or value)
+                let rhs = if let Some(rhs_reg) = params.get("rhs_register") {
+                    rhs_reg.as_str().unwrap_or("").to_string()
+                } else if let Some(rhs_val) = params.get("rhs") {
+                    self.value_to_ruby(rhs_val)
+                } else {
+                    return Err(anyhow!("Write operation requires rhs_register or rhs"));
+                };
+
+                return Ok(format!("{}{} = {} {} {}", indent, action.target, lhs, operator, rhs));
             }
 
             // Otherwise use direct value
@@ -156,7 +169,7 @@ impl RubyCompiler {
             }
         }
 
-        Err(anyhow!("Write requires 'value' parameter or register operation"))
+        Err(anyhow!("Write requires 'value' parameter or operation"))
     }
 
     fn compile_read(&mut self, action: &Action, indent: &str) -> Result<String> {

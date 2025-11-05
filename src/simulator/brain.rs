@@ -367,19 +367,32 @@ impl BrainSimulator {
     fn write_memory(&mut self, action: &Action) -> Result<()> {
         // Write to memory
         if let Some(params) = &action.params {
-            // Check if it's a computed value from registers
-            if let (Some(lhs_reg), Some(rhs_reg), Some(op)) =
-                (params.get("lhs_register"), params.get("rhs_register"), params.get("operation")) {
-
-                // Get values from registers
-                let lhs_val = self.state.beliefs.get(lhs_reg.as_str().unwrap_or(""))
-                    .and_then(|v| v.as_f64().or_else(|| v.as_i64().map(|i| i as f64)))
-                    .unwrap_or(0.0);
-                let rhs_val = self.state.beliefs.get(rhs_reg.as_str().unwrap_or(""))
-                    .and_then(|v| v.as_f64().or_else(|| v.as_i64().map(|i| i as f64)))
-                    .unwrap_or(0.0);
-
+            // Check if it's a computed value
+            if let Some(op) = params.get("operation") {
                 let operation = op.as_str().unwrap_or("");
+
+                // Get left operand (register or value)
+                let lhs_val = if let Some(lhs_reg) = params.get("lhs_register") {
+                    self.state.beliefs.get(lhs_reg.as_str().unwrap_or(""))
+                        .and_then(|v| v.as_f64().or_else(|| v.as_i64().map(|i| i as f64)))
+                        .unwrap_or(0.0)
+                } else if let Some(lhs) = params.get("lhs") {
+                    lhs.as_f64().or_else(|| lhs.as_i64().map(|i| i as f64)).unwrap_or(0.0)
+                } else {
+                    0.0
+                };
+
+                // Get right operand (register or value)
+                let rhs_val = if let Some(rhs_reg) = params.get("rhs_register") {
+                    self.state.beliefs.get(rhs_reg.as_str().unwrap_or(""))
+                        .and_then(|v| v.as_f64().or_else(|| v.as_i64().map(|i| i as f64)))
+                        .unwrap_or(0.0)
+                } else if let Some(rhs) = params.get("rhs") {
+                    rhs.as_f64().or_else(|| rhs.as_i64().map(|i| i as f64)).unwrap_or(0.0)
+                } else {
+                    0.0
+                };
+
                 let result = match operation {
                     "multiply" => lhs_val * rhs_val,
                     "add" => lhs_val + rhs_val,
