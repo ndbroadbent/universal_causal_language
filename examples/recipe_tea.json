@@ -1,0 +1,108 @@
+{
+  "metadata": {
+    "domain": "cooking",
+    "description": "Recipe for making a cup of tea",
+    "recipe": "Simple Black Tea",
+    "servings": 1,
+    "prep_time": "2 minutes",
+    "cook_time": "5 minutes"
+  },
+  "actions": [
+    {
+      "actor": "cook",
+      "op": "Gather",
+      "target": "ingredients",
+      "params": {
+        "items": ["tea_bag", "cup", "kettle"]
+      },
+      "effects": ["Preparation"]
+    },
+    {
+      "actor": "cook",
+      "op": "Measure",
+      "target": "water",
+      "params": {
+        "amount": "250ml",
+        "into": "kettle"
+      }
+    },
+    {
+      "actor": "cook",
+      "op": "Heat",
+      "target": "water",
+      "params": {
+        "container": "kettle",
+        "temperature": "100°C",
+        "until": "boiling"
+      },
+      "dur": 180.0,
+      "effects": ["Thermal"]
+    },
+    {
+      "actor": "cook",
+      "op": "Wait",
+      "target": "water",
+      "params": {
+        "until": "boiling"
+      },
+      "dur": 180.0
+    },
+    {
+      "actor": "cook",
+      "op": "Place",
+      "target": "tea_bag",
+      "params": {
+        "into": "cup"
+      }
+    },
+    {
+      "actor": "cook",
+      "op": "Pour",
+      "target": "water",
+      "params": {
+        "from": "kettle",
+        "into": "cup",
+        "amount": "250ml"
+      },
+      "effects": ["Transfer"]
+    },
+    {
+      "actor": "tea",
+      "op": "Steep",
+      "target": "tea_bag",
+      "params": {
+        "in": "cup",
+        "duration": "3-5 minutes"
+      },
+      "dur": 240.0,
+      "effects": ["Chemical"]
+    },
+    {
+      "actor": "cook",
+      "op": "Wait",
+      "target": "tea",
+      "params": {
+        "duration": "4 minutes"
+      },
+      "dur": 240.0
+    },
+    {
+      "actor": "cook",
+      "op": "Remove",
+      "target": "tea_bag",
+      "params": {
+        "from": "cup"
+      }
+    },
+    {
+      "actor": "cook",
+      "op": "Serve",
+      "target": "tea",
+      "params": {
+        "temperature": "hot",
+        "ready": true
+      },
+      "effects": ["Presentation"]
+    }
+  ]
+}

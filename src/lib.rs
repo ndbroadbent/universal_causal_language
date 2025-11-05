@@ -51,6 +51,17 @@ pub enum Operation {
     // Random number generation
     GenRandomInt,
 
+    // Cooking/recipe operations
+    Gather,
+    Heat,
+    Pour,
+    Mix,
+    Stir,
+    Place,
+    Remove,
+    Steep,
+    Serve,
+
     // Custom operation for extensibility
     Custom(String),
 
