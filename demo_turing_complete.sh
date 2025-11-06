@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "═══════════════════════════════════════════════════════════════════"
-echo "  UCL: Now Turing Complete!"
+echo "  UCL: Turing Complete"
 echo "═══════════════════════════════════════════════════════════════════"
 echo ""
 echo "UCL can now compute ANYTHING that any programming language can."

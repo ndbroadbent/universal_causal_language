@@ -83,7 +83,7 @@ echo "  • Same causal logic, different execution substrates"
 echo ""
 echo "Learn more:"
 echo "  - README.md: Full documentation"
-echo "  - BRAIN_VM.md: The revolutionary brain VM concept"
+echo "  - BRAIN_VM.md: The brain VM concept"
 echo "  - examples/: More UCL programs to try"
 echo ""
 

@@ -26,7 +26,7 @@ UCL is now **Turing complete**, meaning it can compute anything that any other p
 - **Boolean logic** (and/or/not)
 - **Arithmetic expressions**
 
-See `TURING_COMPLETE.md` for details and `examples/fibonacci.json` for a working recursive Fibonacci implementation!
+See `TURING_COMPLETE.md` for details and `examples/fibonacci.json` for a working recursive Fibonacci implementation.
 
 ## One Program, Multiple Substrates
 
@@ -145,7 +145,7 @@ ucl run examples/natural_language.json --target brain
 # Brain simulation with verbose output
 ucl brain examples/natural_language.json --verbose
 
-# PRODUCTION MODE: Run on YOUR actual brain!
+# Production Mode: Run on YOUR actual brain
 ucl brain examples/brain_test.json --production
 ```
 
@@ -274,17 +274,17 @@ ucl brain examples/recipe_tea.json --verbose
 ucl robot examples/recipe_tea.json --verbose
 ```
 
-This demonstrates **substrate independence** - the same causal logic runs on different execution environments!
+This demonstrates **substrate independence** - the same causal logic runs on different execution environments.
 
 ## Example Programs
 
 The `examples/` directory contains complete UCL programs for various domains:
 
-- **fibonacci.json** 🎯 - **Turing complete!** Recursive function with if/else and loops
-- **ai_generate_factorial.json** 🤖 - **Meta-recursion!** AI generates UCL code
+- **fibonacci.json** 🎯 - **Recursive** function with if/else and loops
+- **ai_generate_factorial.json** 🤖 - **Meta-recursion**: AI generates UCL code
 - **ai_chain.json** 🔗 - Full abstraction chain: AI → Compile → Execute
-- **multiply_universal.json** ⭐ - Runs on all three substrates!
-- **recipe_tea.json** 🍵 - Runs on Brain VM and Robot VM!
+- **multiply_universal.json** ⭐ - Runs on all three substrates
+- **recipe_tea.json** 🍵 - Runs on Brain VM and Robot VM
 - **natural_language.json** - English sentences as UCL
 - **ruby_code.json** - Ruby program execution
 - **rust_code.json** - Rust program with memory management
@@ -298,15 +298,15 @@ The `examples/` directory contains complete UCL programs for various domains:
 Try them out:
 
 ```bash
-# TURING COMPLETE! Recursive Fibonacci
+# Turing Complete: Recursive Fibonacci
 ucl run examples/fibonacci.json
 # Output: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55
 
-# META-RECURSION! AI generates UCL code
+# Meta-Recursion: An AI generating UCL code
 ucl ai examples/ai_generate_factorial.json --verbose
-# AI generates factorial function as UCL!
+# (NOTE: An AI could also generate UCL code that runs on another AI.)
 
-# THE UNIVERSAL PROGRAM - runs on all three substrates!
+# A Universal Program: runs on all three substrates
 ucl run examples/multiply_universal.json --target ruby
 ucl brain examples/multiply_universal.json --verbose
 ucl brain examples/multiply_universal.json --production
@@ -326,7 +326,7 @@ done
 
 ## Universal Program Example
 
-**multiply_universal.json** - A program that runs on ALL THREE execution environments!
+**multiply_universal.json** - A program that runs on all three execution environments.
 
 The program:
 
@@ -448,7 +448,7 @@ See [PRODUCTION_BRAIN.md](PRODUCTION_BRAIN.md) for the full guide to running lan
 
 ## 🖥️ UX as Parallel Computation
 
-**Revolutionary insight:** Every program with a UI is running parallel computation on both a CPU and a human brain.
+Every program with a UI is running parallel computation on both a CPU and a human brain.
 
 When you use software, you're not "observing" - you're **executing a parallel program**:
 

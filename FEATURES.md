@@ -3,13 +3,16 @@
 ## 🎯 Core MVP Features
 
 ### ✅ Universal Causal Language Runtime
+
 - JSON-based Action/Program data structures
 - 20+ primitive operations (CRUD, Communication, Logic, Temporal, etc.)
 - Extensible with `Custom(String)` operations
 - Full serialization/deserialization support
 
 ### ✅ CLI Tool
+
 Six powerful commands:
+
 1. **validate** - Validate UCL syntax
 2. **display** - Pretty-print programs (with `--compact` mode)
 3. **analyze** - Statistics and insights
@@ -19,7 +22,9 @@ Six powerful commands:
 7. **brain** - Execute on brain VM
 
 ### ✅ Example Programs
+
 Six diverse domain examples:
+
 - Natural Language (English sentences)
 - Ruby Code (VM execution)
 - Rust Code (memory management)
@@ -28,12 +33,14 @@ Six diverse domain examples:
 - Biology (Central Dogma: DNA→RNA→Protein)
 
 Plus compilation examples:
+
 - hello_world.json
 - simple_calc.json
 - fibonacci.json
 - confusion_test.json
 
 ### ✅ Testing
+
 - 16 tests total (all passing ✓)
 - 9 unit tests (core, compiler, brain)
 - 7 integration tests (all examples)
@@ -54,13 +61,15 @@ ucl run examples/hello_world.json --target ruby
 ```
 
 Supported operations:
+
 - Call, Assign, Write, Read
 - Emit (→ puts)
 - Bind, Create
 - Return, Wait
-- Binary operators (+, -, *, /, etc.)
+- Binary operators (+, -, \*, /, etc.)
 
 Output:
+
 ```ruby
 # Generated from UCL
 # Universal Causal Language -> Ruby Compiler
@@ -69,9 +78,9 @@ puts "Hello, World!"
 puts "Welcome to UCL!"
 ```
 
-### 🧠 Brain VM (REVOLUTIONARY!)
+### 🧠 Brain VM
 
-**The breakthrough:** Language is a program that runs on a human brain substrate.
+Language is a program that runs on a human brain substrate.
 
 The Brain VM executes natural language as literal programs:
 
@@ -119,6 +128,7 @@ Step 2: Transcribe - teacher → DNA
 ```
 
 Effects:
+
 - Adds thought: "Sorry, I don't know what that means: X"
 - Outputs: "I'm not sure what you mean..."
 - Increases **confusion** emotion by +0.4
@@ -185,6 +195,7 @@ Natural language isn't just text to be parsed—it's **code that executes on the
 ### 3. Substrate-Aware Confusion
 
 Each VM responds appropriately to unsupported operations:
+
 - **Ruby**: Compile error or comment
 - **Brain**: "Sorry, I don't know what that means" + emotional response
 
@@ -215,9 +226,11 @@ All domains (language, code, music, law, biology) share the same Action schema:
 ## 🎓 Philosophical Implications
 
 ### Substrate Independence
+
 Cognition is the **computation**, not the substrate. A biological brain and a silicon brain running the same UCL program perform identical cognition.
 
 ### Language as Universal API
+
 ```
 Human Brain API: language → brain_state
 AI Brain API: language → brain_state
@@ -226,6 +239,7 @@ AI Brain API: language → brain_state
 Same interface, different implementations.
 
 ### Understanding as Execution
+
 Understanding isn't recognition—it's **successful execution**. If the brain can't execute an instruction, it doesn't understand it.
 
 ## 🔮 Future Possibilities
@@ -262,4 +276,3 @@ cargo build --release
 ---
 
 **UCL isn't just a language—it's a new way to think about computation, cognition, and communication.**
-

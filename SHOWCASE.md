@@ -2,17 +2,20 @@
 
 ## 🎉 What We Built
 
-A revolutionary system that proves language is executable code and demonstrates **three fundamentally different ways** to execute programs.
+A system that proves language is executable code and demonstrates **three fundamentally different ways** to execute programs.
 
 ## 🚀 Three Execution Modes
 
 ### Mode 1: Single Substrate
+
 ```bash
 ucl run hello_world.json --target ruby
 ```
+
 Traditional execution on one environment.
 
 ### Mode 2: Universal Execution ⭐
+
 ```bash
 # SAME program on THREE different substrates:
 ucl run multiply_universal.json --target ruby         # Silicon
@@ -21,6 +24,7 @@ ucl brain multiply_universal.json --production        # YOUR Wetware!
 ```
 
 ### Mode 3: Parallel Multi-Substrate 🌐
+
 ```bash
 ucl parallel parallel_compute.json --verbose
 ```
@@ -90,6 +94,7 @@ Running `parallel_compute.json`:
 ## 🏗️ Architecture
 
 ### Core System
+
 ```
 src/
 ├── lib.rs              # Core UCL data structures (Action, Operation, Program)
@@ -104,6 +109,7 @@ src/
 ```
 
 ### Examples
+
 ```
 examples/
 ├── multiply_universal.json   ⭐ Universal program (works on ALL substrates)
@@ -123,6 +129,7 @@ examples/
 ```
 
 ### Documentation
+
 ```
 ├── README.md                 # Main documentation
 ├── BRAIN_VM.md              # Language as programs on brains
@@ -136,29 +143,36 @@ examples/
 └── PRD.txt                  # Original vision
 ```
 
-## 💡 Breakthrough Concepts
+## 💡 Concepts
 
 ### 1. Language is Executable Code
+
 Proven by running natural language on Brain VM.
 
 ### 2. Brains are Valid Runtime Environments
+
 Proven by production brain mode (YOU execute operations).
 
 ### 3. Understanding = Successful Execution
+
 When brain can't execute → "Sorry, I don't know what that means"
 
 ### 4. Substrate Independence
+
 Same program on Ruby, Brain VM, and human neurons.
 
 ### 5. UX is Parallel Computation
+
 Every UI is CPU + Brain computing together.
 
 ### 6. Heterogeneous Parallel Computing
+
 Ruby VM + Brain VM working on the same problem.
 
 ## 🎬 Try It Yourself
 
 ### Basic Examples
+
 ```bash
 # Validate
 ucl validate examples/natural_language.json
@@ -171,6 +185,7 @@ ucl analyze examples/biology.json
 ```
 
 ### Ruby Compilation
+
 ```bash
 # Compile to Ruby
 ucl compile examples/hello_world.json --target ruby
@@ -180,6 +195,7 @@ ucl run examples/hello_world.json --target ruby
 ```
 
 ### Brain VM
+
 ```bash
 # Simulate on brain
 ucl brain examples/natural_language.json --verbose
@@ -189,12 +205,14 @@ ucl brain examples/confusion_test.json --verbose
 ```
 
 ### Production Brain
+
 ```bash
 # Run on YOUR actual brain!
 ucl brain examples/brain_test.json --production
 ```
 
 ### Universal Programs
+
 ```bash
 # Same program, multiple substrates
 ucl run examples/multiply_universal.json --target ruby
@@ -203,6 +221,7 @@ ucl brain examples/multiply_universal.json --production
 ```
 
 ### Parallel Execution
+
 ```bash
 # Multiple substrates working together!
 ucl parallel examples/parallel_compute.json --verbose
@@ -211,18 +230,23 @@ ucl parallel examples/parallel_compute.json --verbose
 ## 🧪 Experiments You Can Run
 
 ### 1. Benchmark Your Brain
+
 ```bash
 ucl brain examples/brain_test.json --production
 ```
+
 How fast can YOUR brain execute UCL operations?
 
 ### 2. Test Confusion Response
+
 ```bash
 ucl brain examples/confusion_test.json --verbose
 ```
+
 Watch the brain say "Sorry, I don't know what that means"
 
 ### 3. Compare Substrates
+
 ```bash
 # Run universal program on all three, compare results
 for i in {1..5}; do
@@ -231,6 +255,7 @@ done
 ```
 
 ### 4. Hybrid Computation
+
 ```bash
 # Watch Ruby and Brain collaborate
 ucl parallel examples/parallel_compute.json --verbose
@@ -250,21 +275,25 @@ This isn't just a programming language. It's a **proof** that:
 ## 📈 Impact
 
 ### For Programming
+
 - New paradigm: Substrate-independent code
 - New capability: Heterogeneous parallel execution
 - New insight: Compilation target can be a brain
 
 ### For Neuroscience
+
 - Framework for modeling cognition as computation
 - Testable predictions about mental operations
 - Bridge between symbolic and neural approaches
 
 ### For AI
+
 - Better training: Explicit causal operations instead of text
 - Better architectures: Model different substrates
 - Better alignment: Human-AI as co-processors
 
 ### For HCI
+
 - New perspective: UX as substrate coordination
 - Better design: Optimize for parallel execution
 - Better accessibility: Alternative protocols for different brain types
@@ -291,9 +320,10 @@ With this foundation, imagine:
 
 ## 🙏 Thank You
 
-For exploring this revolutionary concept with us.
+For exploring this concept with us.
 
-**You've just witnessed the future of computing:**
+**You may have just witnessed the future of computing:**
+
 - Programs that run on any substrate
 - Humans as valid CPUs
 - Silicon and wetware working together
@@ -308,4 +338,3 @@ cargo build --release
 ```
 
 **Let's redefine what computation means.**
-

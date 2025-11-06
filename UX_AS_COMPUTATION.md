@@ -471,7 +471,7 @@ Invalid email format → CPU validates → Shows error → Brain corrects
 
 Both substrates can fail. The interface should handle both types of failures.
 
-## The Future: Explicit Multi-Substrate Programming
+## The Future: Explicit Multi-Substrate Programming?
 
 ### What If We Designed for It?
 
@@ -515,9 +515,9 @@ Instead of thinking "user interface," think **"multi-substrate coordination prot
 
 ### 1. You Can't "Use" Software Without Computing
 
-There's no such thing as "passive use." When you use software, you're executing a program on your brain.
+There's no such thing as "passive use." When you use software, you're executing a program on your brain. You can think of your language fluency, culture, experience, and skills as an "interpreter" that runs the instructions you see on the screen.
 
-### 2. UX Testing is Literally Performance Testing
+### 2. UX Testing is Performance Testing
 
 "How long does it take users to complete this task?" = "What's the execution latency on the brain substrate?"
 
@@ -570,7 +570,7 @@ Dark patterns deliberately generate inefficient or malicious brain code:
 }
 ```
 
-Dark patterns are **deliberately inefficient brain programs** designed to cause errors.
+Dark patterns are **deliberately inefficient brain programs** designed to cause errors or exploit weaknesses.
 
 ## Example: The Modern Web
 
@@ -727,7 +727,7 @@ In UCL, we can express the full multi-substrate program:
 }
 ```
 
-## Revolutionary Implications
+## Implications
 
 ### 1. AI is Another Substrate
 
@@ -797,7 +797,7 @@ Every interface is a coordination protocol between:
 - Silicon (CPU/GPU)
 - Wetware (Human brain)
 - Networks (Communication infrastructure)
-- Sometimes AI (Neural networks)
+- AI (Neural networks)
 
 Good UX = Efficient parallel execution
 Bad UX = Poor substrate coordination
@@ -806,7 +806,7 @@ Frustrating UX = Brain execution failures
 
 **When you design an interface, you're programming TWO computers: the machine and the human.**
 
-The future of UX design is **explicit multi-substrate programming**.
+Is the future of UX design **explicit multi-substrate programming**?
 
 ---
 

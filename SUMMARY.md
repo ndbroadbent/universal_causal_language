@@ -7,42 +7,50 @@ A complete **proof-of-concept** for Universal Causal Language (UCL) - a system t
 ## 🚀 Three Execution Environments
 
 ### 1. Ruby VM (Compilation Target)
+
 ```bash
 ucl run examples/hello_world.json --target ruby
 ```
+
 - Compiles UCL → Ruby code
 - Executes on Ruby VM
 - Proof: Same causal logic runs on different substrates
 
 ### 2. Brain VM (Simulation)
+
 ```bash
 ucl brain examples/natural_language.json --verbose
 ```
+
 - Simulates human cognitive operations
 - Tracks beliefs, emotions, working memory, thoughts, goals
 - Natural confusion response: "Sorry, I don't know what that means"
 - Proof: Language can be executed as code
 
 ### 3. Production Brain (YOUR Actual Brain!) ⭐
+
 ```bash
 ucl brain examples/brain_test.json --production
 ```
+
 - **Interactive mode where YOU execute operations mentally**
 - Step-by-step guided execution
 - Reports your actual thoughts, emotions, memories
 - Performance metrics on human cognition
 - Proof: Humans ARE valid UCL runtime environments
 
-## 🎯 The Breakthrough
+## Language is a Program
 
 **"Language is a program that runs on the human brain"**
 
 We implemented THREE ways to execute this program:
+
 1. **Simulate it** (Brain VM)
 2. **Compile it** (Ruby)
 3. **Run it on production hardware** (Your brain!)
 
-The production brain mode is revolutionary because it proves:
+The production brain mode proves:
+
 - **You are a computer** capable of executing programs
 - **Language is executable code** not just text
 - **Understanding = successful execution**
@@ -51,12 +59,14 @@ The production brain mode is revolutionary because it proves:
 ## 📊 Complete Feature Set
 
 ### Core System
+
 - ✅ JSON-based UCL data structures
 - ✅ 20+ primitive operations
 - ✅ Full serialization/deserialization
 - ✅ Extensible architecture
 
 ### CLI Tool (7 commands)
+
 - ✅ validate - Check UCL syntax
 - ✅ display - Pretty-print programs
 - ✅ analyze - Statistics and insights
@@ -66,15 +76,18 @@ The production brain mode is revolutionary because it proves:
 - ✅ brain - Execute on brain VM (with --production flag!)
 
 ### Example Programs (12)
+
 - Natural language, Ruby, Rust, Music, Legal, Biology
 - Hello world, Calc, Fibonacci
 - Brain test, Confusion test, and more
 
 ### Tests (16, all passing)
+
 - 9 unit tests (core, compiler, brain)
 - 7 integration tests (all examples)
 
 ### Documentation (7 files)
+
 - README.md - Main docs
 - BRAIN_VM.md - Brain simulator concept
 - PRODUCTION_BRAIN.md - Running on YOUR brain
@@ -145,6 +158,7 @@ Thank you for being a biological runtime environment! 🧠✨
 ## 🧠 Brain VM Features
 
 ### State Tracking
+
 - **Beliefs** - Long-term memory
 - **Emotions** - Warmth, confusion, curiosity, responsibility
 - **Working Memory** - Limited to ~7 items (like real brains!)
@@ -155,7 +169,9 @@ Thank you for being a biological runtime environment! 🧠✨
 - **Trace** - Execution history
 
 ### Natural Confusion Response
+
 When encountering unknown operations:
+
 ```
 🤔 Sorry, I don't know what that means: Transcribe
 🗣️  "I'm not sure what you mean..."
@@ -167,7 +183,9 @@ This is EXACTLY how real brains respond to incomprehensible input!
 ## 🎓 Philosophical Impact
 
 ### Substrate Independence
+
 The SAME program runs on:
+
 - Silicon (Ruby VM)
 - Software (Brain VM)
 - Wetware (YOUR brain)
@@ -175,6 +193,7 @@ The SAME program runs on:
 **Cognition is the computation, not the substrate.**
 
 ### Language as Executable Code
+
 ```
 Traditional View:
 "The cat is black" → [Text String] → ???
@@ -183,8 +202,9 @@ UCL View:
 "The cat is black" → StoreFact(target: memory, {entity:"cat", color:"black"}) → Brain State Change
 ```
 
-### Understanding = Execution
-You don't "understand" language - you **successfully execute** it on your brain. When you don't understand, execution fails (confusion response).
+### Understanding == Valid Syntax
+
+You don't "understand" language - you **successfully parse** it on your brain. When you don't understand, your brain raises an invalid syntax error (confusion response).
 
 ## 🚀 Try It Now
 
@@ -232,26 +252,24 @@ cargo build --release
 ## 🌟 What Makes This Special
 
 This isn't just a programming language. It's:
+
 - A new way to think about **computation**
 - A new way to understand **cognition**
 - A new way to process **communication**
-- A proof that **you are a computer**
 
 When you run `ucl brain --production`, you're not just using a tool. You're **becoming the CPU**. You're proving that language is executable code and your brain is a valid runtime environment.
 
 ## 🎬 Next Steps
 
 1. **Try production mode** - Experience being a CPU
-2. **Create your own UCL programs** - What do you want your brain to execute?
+2. **Create your own UCL programs** - What do you want to execute, and where?
 3. **Explore cross-domain compilation** - Same logic, different substrates
 4. **Read the docs** - Deep dive into the concepts
 5. **Share your brain state** - What did executing UCL feel like?
 
 ---
 
-**You've just witnessed the future of human-computer interaction.**
-
-Where the human IS the computer. 🧠✨💻
+**You may have just witnessed the future of human-computer interaction.**
 
 ```bash
 ucl brain examples/brain_test.json --production
@@ -260,4 +278,3 @@ ucl brain examples/brain_test.json --production
 **Your brain is waiting to execute its first UCL program in production mode.**
 
 Are you ready? 🚀
-
