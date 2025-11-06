@@ -62,6 +62,17 @@ pub enum Operation {
     Steep,
     Serve,
 
+    // Control flow operations (Turing completeness)
+    If,
+    While,
+    For,
+    DefineFunction,
+
+    // AI/LLM operations
+    Generate,  // AI generates code from instruction
+    Parse,     // Parse code into executable form
+    Execute,   // Execute generated/parsed code
+
     // Custom operation for extensibility
     Custom(String),
 
@@ -69,6 +80,75 @@ pub enum Operation {
     Flurble,  // A nonsense operation
     Grok,     // Deep understanding (not yet implemented)
     Defenestrate,  // A real word but intentionally not supported
+}
+
+/// Represents a condition for control flow (if/while)
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(tag = "type")]
+pub enum Condition {
+    #[serde(rename = "comparison")]
+    Comparison {
+        op: ComparisonOp,
+        left: Expression,
+        right: Expression,
+    },
+    #[serde(rename = "and")]
+    And {
+        operands: Vec<Condition>,
+    },
+    #[serde(rename = "or")]
+    Or {
+        operands: Vec<Condition>,
+    },
+    #[serde(rename = "not")]
+    Not {
+        operand: Box<Condition>,
+    },
+}
+
+/// Comparison operators for conditions
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum ComparisonOp {
+    #[serde(rename = "==")]
+    Equal,
+    #[serde(rename = "!=")]
+    NotEqual,
+    #[serde(rename = "<")]
+    LessThan,
+    #[serde(rename = "<=")]
+    LessThanOrEqual,
+    #[serde(rename = ">")]
+    GreaterThan,
+    #[serde(rename = ">=")]
+    GreaterThanOrEqual,
+}
+
+/// Represents an expression that evaluates to a value
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(untagged)]
+pub enum Expression {
+    /// A variable reference - must come first
+    Variable { var: String },
+    /// A function call - must come before Value
+    FunctionCall {
+        call: String,
+        args: HashMap<String, Expression>,
+    },
+    /// An arithmetic operation - must come before Value
+    BinaryOp {
+        #[serde(rename = "expr")]
+        expr: BinaryOpExpr,
+    },
+    /// A literal value - must come last as it matches anything
+    Value(serde_json::Value),
+}
+
+/// Binary operation expression
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct BinaryOpExpr {
+    pub op: String,
+    pub left: Box<Expression>,
+    pub right: Box<Expression>,
 }
 
 /// A UCL Action represents a single causal event
@@ -106,6 +186,39 @@ pub struct Action {
     /// Domain tags
     #[serde(skip_serializing_if = "Option::is_none")]
     pub effects: Option<Vec<String>>,
+
+    // Control flow fields
+    /// Condition for If/While operations
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub condition: Option<Condition>,
+
+    /// Actions to execute if condition is true (If operation)
+    #[serde(skip_serializing_if = "Option::is_none", rename = "then")]
+    pub then_actions: Option<Vec<Action>>,
+
+    /// Actions to execute if condition is false (If operation)
+    #[serde(skip_serializing_if = "Option::is_none", rename = "else")]
+    pub else_actions: Option<Vec<Action>>,
+
+    /// Actions to execute in loop body (While/For operations)
+    #[serde(skip_serializing_if = "Option::is_none", rename = "body")]
+    pub body_actions: Option<Vec<Action>>,
+
+    /// Loop variable name (For operation)
+    #[serde(skip_serializing_if = "Option::is_none", rename = "variable")]
+    pub loop_var: Option<String>,
+
+    /// Starting value expression (For operation)
+    #[serde(skip_serializing_if = "Option::is_none", rename = "from")]
+    pub from_expr: Option<Expression>,
+
+    /// Ending value expression (For operation)
+    #[serde(skip_serializing_if = "Option::is_none", rename = "to")]
+    pub to_expr: Option<Expression>,
+
+    /// Step value expression (For operation)
+    #[serde(skip_serializing_if = "Option::is_none", rename = "step")]
+    pub step_expr: Option<Expression>,
 }
 
 /// A UCL program is a sequence of actions
@@ -132,6 +245,14 @@ impl Action {
             pre: None,
             post: None,
             effects: None,
+            condition: None,
+            then_actions: None,
+            else_actions: None,
+            body_actions: None,
+            loop_var: None,
+            from_expr: None,
+            to_expr: None,
+            step_expr: None,
         }
     }
 

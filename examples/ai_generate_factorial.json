@@ -1,0 +1,27 @@
+{
+  "metadata": {
+    "domain": "ai_code_generation",
+    "description": "Mock AI generates factorial function, compiles it, and executes it",
+    "demonstrates": "UCL generating UCL - meta-recursion at every layer"
+  },
+  "actions": [
+    {
+      "actor": "ai_agent",
+      "op": "Generate",
+      "target": "factorial_code",
+      "params": {
+        "instruction": "Write a recursive function to calculate factorial",
+        "format": "ucl"
+      }
+    },
+    {
+      "actor": "developer",
+      "op": "Emit",
+      "target": "status",
+      "params": {
+        "content": "AI generated the code successfully!"
+      }
+    }
+  ]
+}
+

@@ -2,7 +2,7 @@ use clap::{Parser, Subcommand};
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
-use ucl::{Program, Operation, compiler::RubyCompiler, simulator::{BrainSimulator, RobotSimulator}, coordinator::MultiSubstrateCoordinator};
+use ucl::{Program, Operation, compiler::RubyCompiler, simulator::{BrainSimulator, RobotSimulator, MockAISimulator}, coordinator::MultiSubstrateCoordinator};
 
 #[derive(Parser)]
 #[command(name = "ucl")]
@@ -98,6 +98,16 @@ enum Commands {
         verbose: bool,
     },
 
+    /// Simulate AI code generation (Mock LLM)
+    Ai {
+        /// Path to the UCL file
+        file: PathBuf,
+
+        /// Verbose output showing generation process
+        #[arg(short, long)]
+        verbose: bool,
+    },
+
     /// Execute across multiple substrates in parallel
     Parallel {
         /// Path to the UCL file
@@ -188,6 +198,16 @@ fn main() {
 
         Commands::Robot { file, verbose } => {
             match robot_simulate(file, *verbose) {
+                Ok(_) => std::process::exit(0),
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    std::process::exit(1);
+                }
+            }
+        }
+
+        Commands::Ai { file, verbose } => {
+            match ai_simulate(file, *verbose) {
                 Ok(_) => std::process::exit(0),
                 Err(e) => {
                     eprintln!("Error: {}", e);
@@ -450,6 +470,33 @@ fn robot_simulate(path: &PathBuf, verbose: bool) -> anyhow::Result<()> {
     simulator.execute(&program)?;
 
     println!("\n{}", simulator.state().display());
+
+    Ok(())
+}
+
+fn ai_simulate(path: &PathBuf, verbose: bool) -> anyhow::Result<()> {
+    let program = validate_file(path)?;
+
+    let mut simulator = MockAISimulator::new().with_verbose(verbose);
+
+    println!("🧠🤖 Simulating AI code generation (Mock LLM)...\n");
+
+    simulator.execute(&program)?;
+
+    println!("\n{}", simulator.state().display());
+
+    // If code was generated, show it
+    if !simulator.state().generated_code.is_empty() {
+        println!("\n=== Generated Code ===\n");
+        for (name, actions) in &simulator.state().generated_code {
+            println!("Target: {}", name);
+            println!("Actions: {}", actions.len());
+
+            // Convert to JSON for display
+            let json = serde_json::to_string_pretty(&actions)?;
+            println!("{}\n", json);
+        }
+    }
 
     Ok(())
 }

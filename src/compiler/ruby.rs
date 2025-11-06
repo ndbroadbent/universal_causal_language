@@ -1,4 +1,4 @@
-use crate::{Action, Operation, Program};
+use crate::{Action, Operation, Program, Condition, ComparisonOp, Expression};
 use anyhow::{anyhow, Result};
 use std::collections::HashMap;
 
@@ -51,6 +51,10 @@ impl RubyCompiler {
             Operation::Decide => self.compile_decide(action, &indent),
             Operation::Wait => self.compile_wait(action, &indent),
             Operation::GenRandomInt => self.compile_gen_random_int(action, &indent),
+            Operation::If => self.compile_if(action),
+            Operation::While => self.compile_while(action),
+            Operation::For => self.compile_for(action),
+            Operation::DefineFunction => self.compile_define_function(action),
             _ => {
                 // For unsupported operations, generate a comment
                 Ok(format!("{}# Unsupported operation: {:?} on {}",
@@ -193,8 +197,10 @@ impl RubyCompiler {
     fn compile_emit(&mut self, action: &Action, indent: &str) -> Result<String> {
         let msg = if let Some(params) = action.params.as_ref() {
             if let Some(content) = params.get("content") {
-                // If content matches the target, it's likely a variable reference
-                if content.as_str() == Some(&action.target) {
+                // Try to parse as Expression first
+                if let Ok(expr) = serde_json::from_value::<Expression>(content.clone()) {
+                    self.compile_expression(&expr)?
+                } else if content.as_str() == Some(&action.target) {
                     action.target.clone()
                 } else {
                     self.value_to_ruby(content)
@@ -239,7 +245,7 @@ impl RubyCompiler {
     }
 
     fn compile_bind(&mut self, action: &Action, indent: &str) -> Result<String> {
-        let value = action.params
+        let value_json = action.params
             .as_ref()
             .and_then(|p| p.get("value"))
             .ok_or_else(|| anyhow!("Bind requires 'value' parameter"))?;
@@ -247,15 +253,31 @@ impl RubyCompiler {
         let var_name = &action.target;
         self.variables.insert(var_name.clone(), "bound".to_string());
 
-        Ok(format!("{}{} = {}", indent, var_name, self.value_to_ruby(value)))
+        // Try to parse as Expression first
+        let value_str = if let Ok(expr) = serde_json::from_value::<Expression>(value_json.clone()) {
+            self.compile_expression(&expr)?
+        } else {
+            self.value_to_ruby(value_json)
+        };
+
+        Ok(format!("{}{} = {}", indent, var_name, value_str))
     }
 
     fn compile_return(&mut self, action: &Action, indent: &str) -> Result<String> {
-        let value = action.params
-            .as_ref()
-            .and_then(|p| p.get("value"))
-            .map(|v| self.value_to_ruby(v))
-            .unwrap_or_else(|| action.target.clone());
+        let value = if let Some(params) = action.params.as_ref() {
+            if let Some(value_json) = params.get("value") {
+                // Try to parse as Expression first
+                if let Ok(expr) = serde_json::from_value::<Expression>(value_json.clone()) {
+                    self.compile_expression(&expr)?
+                } else {
+                    self.value_to_ruby(value_json)
+                }
+            } else {
+                action.target.clone()
+            }
+        } else {
+            action.target.clone()
+        };
 
         Ok(format!("{}return {}", indent, value))
     }
@@ -300,6 +322,197 @@ impl RubyCompiler {
 
         // Ruby: variable = rand(min..max)
         Ok(format!("{}{} = rand({}..{})", indent, var_name, min, max))
+    }
+
+    fn compile_if(&mut self, action: &Action) -> Result<String> {
+        let indent = "  ".repeat(self.indent_level);
+        let condition = action.condition.as_ref()
+            .ok_or_else(|| anyhow!("If operation requires condition"))?;
+
+        let mut output = String::new();
+        output.push_str(&format!("{}if {}\n", indent, self.compile_condition(condition)?));
+
+        // Compile then branch
+        if let Some(then_actions) = &action.then_actions {
+            self.indent_level += 1;
+            for then_action in then_actions {
+                let code = self.compile_action(then_action)?;
+                if !code.is_empty() {
+                    output.push_str(&code);
+                    output.push('\n');
+                }
+            }
+            self.indent_level -= 1;
+        }
+
+        // Compile else branch if present
+        if let Some(else_actions) = &action.else_actions {
+            output.push_str(&format!("{}else\n", indent));
+            self.indent_level += 1;
+            for else_action in else_actions {
+                let code = self.compile_action(else_action)?;
+                if !code.is_empty() {
+                    output.push_str(&code);
+                    output.push('\n');
+                }
+            }
+            self.indent_level -= 1;
+        }
+
+        output.push_str(&format!("{}end", indent));
+        Ok(output)
+    }
+
+    fn compile_while(&mut self, action: &Action) -> Result<String> {
+        let indent = "  ".repeat(self.indent_level);
+        let condition = action.condition.as_ref()
+            .ok_or_else(|| anyhow!("While operation requires condition"))?;
+
+        let mut output = String::new();
+        output.push_str(&format!("{}while {}\n", indent, self.compile_condition(condition)?));
+
+        // Compile body
+        if let Some(body_actions) = &action.body_actions {
+            self.indent_level += 1;
+            for body_action in body_actions {
+                let code = self.compile_action(body_action)?;
+                if !code.is_empty() {
+                    output.push_str(&code);
+                    output.push('\n');
+                }
+            }
+            self.indent_level -= 1;
+        }
+
+        output.push_str(&format!("{}end", indent));
+        Ok(output)
+    }
+
+    fn compile_for(&mut self, action: &Action) -> Result<String> {
+        let indent = "  ".repeat(self.indent_level);
+        let loop_var = action.loop_var.as_ref()
+            .ok_or_else(|| anyhow!("For operation requires variable"))?;
+        let from_expr = action.from_expr.as_ref()
+            .ok_or_else(|| anyhow!("For operation requires from expression"))?;
+        let to_expr = action.to_expr.as_ref()
+            .ok_or_else(|| anyhow!("For operation requires to expression"))?;
+
+        let from_val = self.compile_expression(from_expr)?;
+        let to_val = self.compile_expression(to_expr)?;
+
+        let mut output = String::new();
+        output.push_str(&format!("{}({} .. {}).each do |{}|\n",
+            indent, from_val, to_val, loop_var));
+
+        // Compile body
+        if let Some(body_actions) = &action.body_actions {
+            self.indent_level += 1;
+            for body_action in body_actions {
+                let code = self.compile_action(body_action)?;
+                if !code.is_empty() {
+                    output.push_str(&code);
+                    output.push('\n');
+                }
+            }
+            self.indent_level -= 1;
+        }
+
+        output.push_str(&format!("{}end", indent));
+        Ok(output)
+    }
+
+    fn compile_define_function(&mut self, action: &Action) -> Result<String> {
+        let indent = "  ".repeat(self.indent_level);
+        let func_name = &action.target;
+
+        // Extract function args and body from params
+        let params = action.params.as_ref()
+            .ok_or_else(|| anyhow!("DefineFunction requires params"))?;
+
+        let args = params.get("args")
+            .and_then(|v| v.as_array())
+            .ok_or_else(|| anyhow!("DefineFunction requires args array"))?;
+
+        let arg_names: Vec<String> = args.iter()
+            .filter_map(|v| v.as_str())
+            .map(|s| s.to_string())
+            .collect();
+
+        let body_value = params.get("body")
+            .ok_or_else(|| anyhow!("DefineFunction requires body"))?;
+
+        // Parse body as array of actions
+        let body_actions: Vec<Action> = serde_json::from_value(body_value.clone())?;
+
+        let mut output = String::new();
+        output.push_str(&format!("{}def {}({})\n", indent, func_name, arg_names.join(", ")));
+
+        // Compile function body
+        self.indent_level += 1;
+        for body_action in &body_actions {
+            let code = self.compile_action(body_action)?;
+            if !code.is_empty() {
+                output.push_str(&code);
+                output.push('\n');
+            }
+        }
+        self.indent_level -= 1;
+
+        output.push_str(&format!("{}end", indent));
+        Ok(output)
+    }
+
+    fn compile_condition(&self, condition: &Condition) -> Result<String> {
+        match condition {
+            Condition::Comparison { op, left, right } => {
+                let left_val = self.compile_expression(left)?;
+                let right_val = self.compile_expression(right)?;
+                let op_str = match op {
+                    ComparisonOp::Equal => "==",
+                    ComparisonOp::NotEqual => "!=",
+                    ComparisonOp::LessThan => "<",
+                    ComparisonOp::LessThanOrEqual => "<=",
+                    ComparisonOp::GreaterThan => ">",
+                    ComparisonOp::GreaterThanOrEqual => ">=",
+                };
+                Ok(format!("{} {} {}", left_val, op_str, right_val))
+            }
+            Condition::And { operands } => {
+                let parts: Result<Vec<String>> = operands.iter()
+                    .map(|c| self.compile_condition(c))
+                    .collect();
+                Ok(format!("({})", parts?.join(" && ")))
+            }
+            Condition::Or { operands } => {
+                let parts: Result<Vec<String>> = operands.iter()
+                    .map(|c| self.compile_condition(c))
+                    .collect();
+                Ok(format!("({})", parts?.join(" || ")))
+            }
+            Condition::Not { operand } => {
+                Ok(format!("!({})", self.compile_condition(operand)?))
+            }
+        }
+    }
+
+    fn compile_expression(&self, expr: &Expression) -> Result<String> {
+        match expr {
+            Expression::Value(v) => Ok(self.value_to_ruby(v)),
+            Expression::Variable { var } => Ok(var.clone()),
+            Expression::BinaryOp { expr: bin_op } => {
+                let left_val = self.compile_expression(&bin_op.left)?;
+                let right_val = self.compile_expression(&bin_op.right)?;
+                Ok(format!("({} {} {})", left_val, bin_op.op, right_val))
+            }
+            Expression::FunctionCall { call, args } => {
+                // For function calls in expressions, use positional arguments (in order of keys)
+                // This assumes the args are in the right order or that there's only one arg
+                let arg_strs: Result<Vec<String>> = args.values()
+                    .map(|v| self.compile_expression(v))
+                    .collect();
+                Ok(format!("{}({})", call, arg_strs?.join(", ")))
+            }
+        }
     }
 
     fn value_to_ruby(&self, value: &serde_json::Value) -> String {

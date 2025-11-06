@@ -1,6 +1,13 @@
-use crate::{Action, Operation, Program};
-use anyhow::Result;
+use crate::{Action, Operation, Program, Condition, ComparisonOp, Expression};
+use anyhow::{Result, anyhow};
 use std::collections::HashMap;
+
+/// Represents a learned function (skill) in the brain
+#[derive(Debug, Clone)]
+pub struct FunctionDef {
+    pub args: Vec<String>,
+    pub body: Vec<crate::Action>,
+}
 
 /// Represents the state of a simulated human brain
 #[derive(Debug, Clone)]
@@ -28,6 +35,9 @@ pub struct BrainState {
 
     /// Execution trace for debugging
     pub trace: Vec<String>,
+
+    /// Learned functions (skills/procedures)
+    pub functions: HashMap<String, FunctionDef>,
 }
 
 impl BrainState {
@@ -41,6 +51,7 @@ impl BrainState {
             thoughts: Vec::new(),
             goals: Vec::new(),
             trace: Vec::new(),
+            functions: HashMap::new(),
         }
     }
 
@@ -115,6 +126,8 @@ impl Default for BrainState {
 pub struct BrainSimulator {
     state: BrainState,
     verbose: bool,
+    recursion_depth: usize,
+    max_recursion_depth: usize,
 }
 
 impl BrainSimulator {
@@ -122,6 +135,8 @@ impl BrainSimulator {
         Self {
             state: BrainState::new(),
             verbose: false,
+            recursion_depth: 0,
+            max_recursion_depth: 1000,
         }
     }
 
@@ -156,6 +171,11 @@ impl BrainSimulator {
     }
 
     fn execute_action(&mut self, action: &Action) -> Result<()> {
+        // Check recursion depth
+        if self.recursion_depth >= self.max_recursion_depth {
+            return Err(anyhow!("Maximum recursion depth exceeded"));
+        }
+
         let trace_msg = format!("{:?}({})", action.op, action.target);
         self.state.trace.push(trace_msg);
 
@@ -173,6 +193,12 @@ impl BrainSimulator {
             Operation::Oblige => self.create_obligation(action),
             Operation::Wait => self.wait(action),
             Operation::GenRandomInt => self.gen_random_int(action),
+
+            // Control flow operations
+            Operation::If => self.execute_if(action),
+            Operation::While => self.execute_while(action),
+            Operation::For => self.execute_for(action),
+            Operation::DefineFunction => self.execute_define_function(action),
 
             // Cooking operations - simulated as physical actions
             Operation::Gather => self.physical_action(action, "👐", "Gathering"),
@@ -553,6 +579,273 @@ impl BrainSimulator {
         }
 
         Ok(())
+    }
+
+    fn execute_if(&mut self, action: &Action) -> Result<()> {
+        let condition = action.condition.as_ref()
+            .ok_or_else(|| anyhow!("If requires condition"))?;
+
+        let result = self.evaluate_condition(condition)?;
+
+        if self.verbose {
+            println!("  🤔 Evaluating condition: {}", result);
+        }
+
+        if result {
+            if let Some(then_actions) = &action.then_actions {
+                for then_action in then_actions {
+                    self.recursion_depth += 1;
+                    self.execute_action(then_action)?;
+                    self.recursion_depth -= 1;
+                }
+            }
+        } else if let Some(else_actions) = &action.else_actions {
+            for else_action in else_actions {
+                self.recursion_depth += 1;
+                self.execute_action(else_action)?;
+                self.recursion_depth -= 1;
+            }
+        }
+
+        Ok(())
+    }
+
+    fn execute_while(&mut self, action: &Action) -> Result<()> {
+        let condition = action.condition.as_ref()
+            .ok_or_else(|| anyhow!("While requires condition"))?;
+
+        let mut iterations = 0;
+        const MAX_ITERATIONS: usize = 10000;
+
+        while self.evaluate_condition(condition)? {
+            if iterations >= MAX_ITERATIONS {
+                return Err(anyhow!("While loop exceeded maximum iterations"));
+            }
+
+            if let Some(body_actions) = &action.body_actions {
+                for body_action in body_actions {
+                    self.recursion_depth += 1;
+                    self.execute_action(body_action)?;
+                    self.recursion_depth -= 1;
+                }
+            }
+
+            iterations += 1;
+        }
+
+        if self.verbose {
+            println!("  🔄 Loop completed {} iterations", iterations);
+        }
+
+        Ok(())
+    }
+
+    fn execute_for(&mut self, action: &Action) -> Result<()> {
+        let loop_var = action.loop_var.as_ref()
+            .ok_or_else(|| anyhow!("For requires variable"))?;
+        let from_expr = action.from_expr.as_ref()
+            .ok_or_else(|| anyhow!("For requires from expression"))?;
+        let to_expr = action.to_expr.as_ref()
+            .ok_or_else(|| anyhow!("For requires to expression"))?;
+
+        let from_val = self.evaluate_expression(from_expr)?;
+        let to_val = self.evaluate_expression(to_expr)?;
+
+        let from_i = from_val.as_i64().ok_or_else(|| anyhow!("For from must be integer"))?;
+        let to_i = to_val.as_i64().ok_or_else(|| anyhow!("For to must be integer"))?;
+
+        for i in from_i..=to_i {
+            // Set loop variable
+            self.state.beliefs.insert(loop_var.clone(), serde_json::json!(i));
+
+            if let Some(body_actions) = &action.body_actions {
+                for body_action in body_actions {
+                    self.recursion_depth += 1;
+                    self.execute_action(body_action)?;
+                    self.recursion_depth -= 1;
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    fn execute_define_function(&mut self, action: &Action) -> Result<()> {
+        let func_name = &action.target;
+        let params = action.params.as_ref()
+            .ok_or_else(|| anyhow!("DefineFunction requires params"))?;
+
+        let args = params.get("args")
+            .and_then(|v| v.as_array())
+            .ok_or_else(|| anyhow!("DefineFunction requires args array"))?;
+
+        let arg_names: Vec<String> = args.iter()
+            .filter_map(|v| v.as_str())
+            .map(|s| s.to_string())
+            .collect();
+
+        let body_value = params.get("body")
+            .ok_or_else(|| anyhow!("DefineFunction requires body"))?;
+
+        let body_actions: Vec<Action> = serde_json::from_value(body_value.clone())?;
+
+        let func_def = FunctionDef {
+            args: arg_names.clone(),
+            body: body_actions,
+        };
+
+        self.state.functions.insert(func_name.clone(), func_def);
+        self.state.thoughts.push(format!("Learned new skill: {}({})", func_name, arg_names.join(", ")));
+
+        if self.verbose {
+            println!("  💡 Learned function: {}({})", func_name, arg_names.join(", "));
+        }
+
+        Ok(())
+    }
+
+    fn evaluate_condition(&mut self, condition: &Condition) -> Result<bool> {
+        match condition {
+            Condition::Comparison { op, left, right } => {
+                let left_val = self.evaluate_expression(left)?;
+                let right_val = self.evaluate_expression(right)?;
+
+                let result = match op {
+                    ComparisonOp::Equal => left_val == right_val,
+                    ComparisonOp::NotEqual => left_val != right_val,
+                    ComparisonOp::LessThan => {
+                        if let (Some(l), Some(r)) = (left_val.as_f64(), right_val.as_f64()) {
+                            l < r
+                        } else {
+                            false
+                        }
+                    }
+                    ComparisonOp::LessThanOrEqual => {
+                        if let (Some(l), Some(r)) = (left_val.as_f64(), right_val.as_f64()) {
+                            l <= r
+                        } else {
+                            false
+                        }
+                    }
+                    ComparisonOp::GreaterThan => {
+                        if let (Some(l), Some(r)) = (left_val.as_f64(), right_val.as_f64()) {
+                            l > r
+                        } else {
+                            false
+                        }
+                    }
+                    ComparisonOp::GreaterThanOrEqual => {
+                        if let (Some(l), Some(r)) = (left_val.as_f64(), right_val.as_f64()) {
+                            l >= r
+                        } else {
+                            false
+                        }
+                    }
+                };
+                Ok(result)
+            }
+            Condition::And { operands } => {
+                for cond in operands {
+                    if !self.evaluate_condition(cond)? {
+                        return Ok(false);
+                    }
+                }
+                Ok(true)
+            }
+            Condition::Or { operands } => {
+                for cond in operands {
+                    if self.evaluate_condition(cond)? {
+                        return Ok(true);
+                    }
+                }
+                Ok(false)
+            }
+            Condition::Not { operand } => {
+                Ok(!self.evaluate_condition(operand)?)
+            }
+        }
+    }
+
+    fn evaluate_expression(&mut self, expr: &Expression) -> Result<serde_json::Value> {
+        match expr {
+            Expression::Value(v) => Ok(v.clone()),
+            Expression::Variable { var } => {
+                self.state.beliefs.get(var)
+                    .cloned()
+                    .ok_or_else(|| anyhow!("Variable not found: {}", var))
+            }
+            Expression::BinaryOp { expr: bin_op } => {
+                let left_val = self.evaluate_expression(&bin_op.left)?;
+                let right_val = self.evaluate_expression(&bin_op.right)?;
+
+                let left_num = left_val.as_f64().ok_or_else(|| anyhow!("Left operand must be number"))?;
+                let right_num = right_val.as_f64().ok_or_else(|| anyhow!("Right operand must be number"))?;
+
+                let result = match bin_op.op.as_str() {
+                    "+" => left_num + right_num,
+                    "-" => left_num - right_num,
+                    "*" => left_num * right_num,
+                    "/" => {
+                        if right_num == 0.0 {
+                            return Err(anyhow!("Division by zero"));
+                        }
+                        left_num / right_num
+                    }
+                    "%" => left_num % right_num,
+                    _ => return Err(anyhow!("Unknown operator: {}", bin_op.op)),
+                };
+
+                Ok(serde_json::json!(result))
+            }
+            Expression::FunctionCall { call, args } => {
+                // Get function definition
+                let func_def = self.state.functions.get(call)
+                    .ok_or_else(|| anyhow!("Function not defined: {}", call))?
+                    .clone();
+
+                // Save current variable state
+                let saved_vars: HashMap<String, serde_json::Value> = func_def.args.iter()
+                    .filter_map(|arg| self.state.beliefs.get(arg).map(|v| (arg.clone(), v.clone())))
+                    .collect();
+
+                // Bind arguments
+                for (arg_name, arg_expr) in args {
+                    let arg_value = self.evaluate_expression(arg_expr)?;
+                    self.state.beliefs.insert(arg_name.clone(), arg_value);
+                }
+
+                // Execute function body
+                let mut return_value = serde_json::Value::Null;
+                for action in &func_def.body {
+                    // Check for Return operation
+                    if matches!(action.op, Operation::Return) {
+                        if let Some(params) = &action.params {
+                            if let Some(value_expr) = params.get("value") {
+                                // value_expr might be an Expression wrapped in JSON
+                                // Try to deserialize it as Expression
+                                if let Ok(expr) = serde_json::from_value::<Expression>(value_expr.clone()) {
+                                    return_value = self.evaluate_expression(&expr)?;
+                                } else {
+                                    return_value = value_expr.clone();
+                                }
+                            }
+                        }
+                        break;
+                    }
+
+                    self.recursion_depth += 1;
+                    self.execute_action(action)?;
+                    self.recursion_depth -= 1;
+                }
+
+                // Restore saved variables
+                for (arg_name, saved_value) in saved_vars {
+                    self.state.beliefs.insert(arg_name, saved_value);
+                }
+
+                Ok(return_value)
+            }
+        }
     }
 
     fn physical_action(&mut self, action: &Action, emoji: &str, verb: &str) -> Result<()> {

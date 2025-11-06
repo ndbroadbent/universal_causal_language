@@ -1,0 +1,68 @@
+{
+  "metadata": {
+    "domain": "meta_programming",
+    "description": "Complete abstraction chain: AI generates UCL → Compiles to Ruby → Executes → Verifies result",
+    "demonstrates": "Every layer mockable, traceable, testable"
+  },
+  "actions": [
+    {
+      "actor": "developer",
+      "op": "Emit",
+      "target": "instruction",
+      "params": {
+        "content": "I need a factorial function"
+      }
+    },
+    {
+      "actor": "ai_agent",
+      "op": "Generate",
+      "target": "factorial_definition",
+      "params": {
+        "instruction": "Write a recursive factorial function",
+        "format": "ucl"
+      }
+    },
+    {
+      "actor": "compiler",
+      "op": "Emit",
+      "target": "status",
+      "params": {
+        "content": "Compiling generated code to Ruby..."
+      }
+    },
+    {
+      "actor": "ruby_vm",
+      "op": "Emit",
+      "target": "execution",
+      "params": {
+        "content": "Executing: factorial(5)"
+      }
+    },
+    {
+      "actor": "ruby_vm",
+      "op": "Emit",
+      "target": "result",
+      "params": {
+        "content": "Result: 120"
+      }
+    },
+    {
+      "actor": "tester",
+      "op": "Assert",
+      "target": "verification",
+      "params": {
+        "statement": "factorial(5) == 120",
+        "passed": true
+      }
+    },
+    {
+      "actor": "developer",
+      "op": "Emit",
+      "target": "success",
+      "params": {
+        "content": "✅ AI-generated code works perfectly!"
+      }
+    }
+  ]
+}
+

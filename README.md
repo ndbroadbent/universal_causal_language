@@ -1,6 +1,6 @@
 # Universal Causal Language (UCL)
 
-An experimental intermediate representation designed to express **causality** across all domains: natural language, programming, law, biology, and art.
+An experimental **Turing complete** intermediate representation designed to express **causality** across all domains: natural language, programming, law, biology, and art.
 
 ## Overview
 
@@ -11,16 +11,32 @@ UCL treats every statement, instruction, law, or behavior as a causal operation:
 - Legal contracts
 - Musical scores
 - DNA transcription events
+- Recursive algorithms (fibonacci, quicksort, etc.)
+- Control flow (if/else, loops, functions)
 
 ...all in the same underlying schema.
 
-## One Program, Three Substrates
+### ✨ Turing Completeness
+
+UCL is now **Turing complete**, meaning it can compute anything that any other programming language can compute. It supports:
+
+- **Conditional branching** (if/else)
+- **Loops** (while, for)
+- **Recursive functions** (DefineFunction)
+- **Boolean logic** (and/or/not)
+- **Arithmetic expressions**
+
+See `TURING_COMPLETE.md` for details and `examples/fibonacci.json` for a working recursive Fibonacci implementation!
+
+## One Program, Multiple Substrates
 
 **The same UCL program can run on:**
 
 1. **Ruby VM** (compiled to Ruby, executed on silicon)
 2. **Brain VM** (simulated human cognition in software)
-3. **YOUR actual brain** (production mode - you execute it mentally)
+3. **Robot VM** (simulated physical operations)
+4. **AI VM** (Mock LLM generates UCL from instructions)
+5. **YOUR actual brain** (production mode - you execute it mentally)
 
 Try it:
 
@@ -72,6 +88,8 @@ UCL supports the following primitive operations:
 - **Legal**: Oblige, Permit, Remedy
 - **Biological**: Transcribe, Translate, Express
 - **Programming**: Call, Assign, Return
+- **Control Flow**: If, While, For, DefineFunction
+- **Cooking**: Gather, Heat, Pour, Mix, Stir, Place, Remove, Steep, Serve
 - **Custom**: Custom(String) for domain-specific operations
 
 ## CLI Usage
@@ -262,6 +280,9 @@ This demonstrates **substrate independence** - the same causal logic runs on dif
 
 The `examples/` directory contains complete UCL programs for various domains:
 
+- **fibonacci.json** 🎯 - **Turing complete!** Recursive function with if/else and loops
+- **ai_generate_factorial.json** 🤖 - **Meta-recursion!** AI generates UCL code
+- **ai_chain.json** 🔗 - Full abstraction chain: AI → Compile → Execute
 - **multiply_universal.json** ⭐ - Runs on all three substrates!
 - **recipe_tea.json** 🍵 - Runs on Brain VM and Robot VM!
 - **natural_language.json** - English sentences as UCL
@@ -270,12 +291,21 @@ The `examples/` directory contains complete UCL programs for various domains:
 - **music.json** - C major scale
 - **legal_contract.json** - Purchase agreement
 - **biology.json** - Central Dogma (DNA → RNA → Protein)
-- **brain_test.json** - Test program for production brain mode
-- **confusion_test.json** - Tests brain's confusion response
+- **brain_test.json** - Test your actual brain in production mode
+- **confusion_test.json** - Tests brain response to unknown operations
+- **incomprehensible.json** - Advanced brain comprehension test
 
 Try them out:
 
 ```bash
+# TURING COMPLETE! Recursive Fibonacci
+ucl run examples/fibonacci.json
+# Output: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55
+
+# META-RECURSION! AI generates UCL code
+ucl ai examples/ai_generate_factorial.json --verbose
+# AI generates factorial function as UCL!
+
 # THE UNIVERSAL PROGRAM - runs on all three substrates!
 ucl run examples/multiply_universal.json --target ruby
 ucl brain examples/multiply_universal.json --verbose

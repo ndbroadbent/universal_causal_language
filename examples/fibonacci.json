@@ -1,66 +1,117 @@
 {
   "metadata": {
     "domain": "programming",
-    "description": "Calculate first 5 Fibonacci numbers",
+    "description": "Calculate Fibonacci numbers using recursive function - demonstrates Turing completeness",
     "target": "ruby"
   },
   "actions": [
     {
       "actor": "VM",
-      "op": "Bind",
-      "target": "a",
+      "op": "DefineFunction",
+      "target": "fibonacci",
       "params": {
-        "value": 0
-      }
-    },
-    {
-      "actor": "VM",
-      "op": "Bind",
-      "target": "b",
-      "params": {
-        "value": 1
+        "args": ["n"],
+        "body": [
+          {
+            "actor": "VM",
+            "op": "If",
+            "target": "base_case",
+            "condition": {
+              "type": "comparison",
+              "op": "<=",
+              "left": {"var": "n"},
+              "right": 1
+            },
+            "then": [
+              {
+                "actor": "VM",
+                "op": "Return",
+                "target": "result",
+                "params": {
+                  "value": {"var": "n"}
+                }
+              }
+            ],
+            "else": [
+              {
+                "actor": "VM",
+                "op": "Return",
+                "target": "result",
+                "params": {
+                  "value": {
+                    "expr": {
+                      "op": "+",
+                      "left": {
+                        "call": "fibonacci",
+                        "args": {
+                          "n": {
+                            "expr": {
+                              "op": "-",
+                              "left": {"var": "n"},
+                              "right": 1
+                            }
+                          }
+                        }
+                      },
+                      "right": {
+                        "call": "fibonacci",
+                        "args": {
+                          "n": {
+                            "expr": {
+                              "op": "-",
+                              "left": {"var": "n"},
+                              "right": 2
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
       }
     },
     {
       "actor": "VM",
       "op": "Emit",
-      "target": "output",
+      "target": "header",
       "params": {
         "content": "Fibonacci sequence:"
       }
     },
     {
       "actor": "VM",
-      "op": "Call",
-      "target": "print",
-      "params": {
-        "arg": 0
-      }
-    },
-    {
-      "actor": "VM",
-      "op": "Call",
-      "target": "print",
-      "params": {
-        "arg": 1
-      }
-    },
-    {
-      "actor": "VM",
-      "op": "Bind",
-      "target": "c",
-      "params": {
-        "value": 1
-      }
-    },
-    {
-      "actor": "VM",
-      "op": "Call",
-      "target": "print",
-      "params": {
-        "arg": 1
-      }
+      "op": "For",
+      "target": "loop",
+      "variable": "i",
+      "from": 0,
+      "to": 10,
+      "body": [
+        {
+          "actor": "VM",
+          "op": "Bind",
+          "target": "result",
+          "params": {
+            "value": {
+              "call": "fibonacci",
+              "args": {
+                "n": {"var": "i"}
+              }
+            }
+          }
+        },
+        {
+          "actor": "VM",
+          "op": "Emit",
+          "target": "output",
+          "params": {
+            "content": {"var": "result"}
+          }
+        }
+      ]
     }
   ]
 }
-
